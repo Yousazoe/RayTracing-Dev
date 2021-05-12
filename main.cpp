@@ -13,7 +13,8 @@ int main() {
     const int image_width = 200;
     const int image_height = 100;
 
-    std::cout << "\nimage width: " << image_width << "    image height: " << image_height << "\n255\n";
+    //std::cout << "\nimage width: " << image_width << "    image height: " << image_height << "\n255\n";
+    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     vec3 lower_left_corner(-2.0,-1.0,-1.0);
     vec3 horizontal(4.0,0.0,0.0);

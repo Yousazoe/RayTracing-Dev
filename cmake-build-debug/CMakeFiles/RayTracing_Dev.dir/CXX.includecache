@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp
+ray.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+iostream
+-
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+vec3.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+iostream
+-
+cmath
+-
+
