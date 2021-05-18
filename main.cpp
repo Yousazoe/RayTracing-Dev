@@ -1,68 +1,18 @@
-#include "ray.h"
+#include "rtweekend.h"
+
+#include "hittable_list.h"
+#include "sphere.h"
 
 #include <iostream>
 
-/*  Function: hit_sphere
- *  Input:
- *      center: sphere center point
- *      radius: sphere radius
- *      ray: hit ray
- *
- *  Output:
- *      delta: hit position time (ray.t)
- *
- *  Math Derivation:
- *      (p(t) - c)(p(t) - c) = R * R -> a t^2 + b t + c = 0
- *      vec(b) * vec(b) t^2 + 2vec(b) * vec(a - c) t + vec(a - c) * vec(a - c) - R * R = 0
- *      a = vec(b) * vec(b)
- *      b = 2vec(b) * vec(a - c)
- *      c = vec(a - c) * vec(a - c) - R * R
- *
- *      delta = b^2 - 4ac
- *      delta > 0 -> root = 2; delta = 0 -> root = 1; delta < 0 -> root = 0
- */
-double hit_sphere(const vec3& center,double radius,const ray& r) {
-    vec3 oc = r.origin() - center;
-    auto a = dot(r.direction(),r.direction());  // a = vec(b) * vec(b)
-    auto b = 2.0 * dot(oc,r.direction());       // b = 2vec(b) * vec(a - c)
-    auto c = dot(oc,oc) - radius * radius;      // c = vec(a - c) * vec(a - c) - R * R
-    auto discriminant = b * b - 4 * a * c;      // delta = b^2 - 4ac
-
-    //The root doesn't exist : return -1.0
-    if (discriminant < 0) {
-        return -1.0;
-    } else {
-    //The root exist : return root t;
-        return (-b - std::sqrt(discriminant)) / (2.0 * a);
-    }
-}
-
-/*  Function: ray_color
- *  Input:
- *      ray: render ray with color
- *
- *  Output:
- *      color: linear lerp color br RGB
- */
-
-vec3 ray_color(const ray& r) {
-
-    //The root which ray hit sphere
-    auto t = hit_sphere(vec3(0,0,-1),0.5,r);
-
-    //The root exist
-    if (t > 0.0) {
-        //P: hit point r.at(t)    C: sphere center vec(0,0,-1)
-        vec3 N = unit_vector(vec3(r.at(t) - vec3(0,0,-1)));
-
-        //From (-1,1) to (0,1)
-        return 0.5 * vec3(N.x() + 1,N.y() + 1,N.z() + 1);
+vec3 ray_color(const ray& r,const hittable& world) {
+    hit_record rec;
+    if (world.hit(r,0,infinity,rec)){
+        return 0.5 * (rec.normal + vec3(1,1,1));
     }
 
     vec3 unit_direction = unit_vector(r.direction());
-    t = 0.5 * (unit_direction.y() + 1.0);
-
-    //Linear lerp RGB color
+    auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * vec3(1.0,1.0,1.0) + t * vec3(0.5,0.7,1.0);
 }
 
@@ -79,15 +29,21 @@ int main() {
     vec3 vertical(0.0,2.0,0.0);
     vec3 origin(0.0,0.0,0.0);
 
+
+    hittable_list world;
+    world.add(make_shared<sphere>(vec3(0,0,-1),0.5));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1),100));
+
+
     for (int j = image_height - 1; j >= 0; --j) {
         //Add a progress indicator output
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
             auto u = double(i) / image_width;
             auto v = double(j) /image_height;
-
             ray r(origin,lower_left_corner + u * horizontal + v * vertical);
-            vec3 color = ray_color(r);
+
+            vec3 color = ray_color(r,world);
             color.write_color(std::cout);
         }
     }

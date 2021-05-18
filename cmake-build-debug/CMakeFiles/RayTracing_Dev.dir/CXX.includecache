@@ -6,13 +6,49 @@
 
 #IncludeRegexTransform: 
 
-/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+memory
+-
+vector
+-
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+hittable_list.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
+sphere.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h
 iostream
 -
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+vec3.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+cmath
+-
+cstdlib
+-
+limits
+-
+memory
+-
+ray.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+vec3.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
 

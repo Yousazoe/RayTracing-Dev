@@ -28,6 +28,7 @@ bool sphere::hit(const ray& r,double t_min,double t_max,hit_record& rec) const{
         auto temp = (-half_b - sqrt(discriminant)) / a;
         if (temp < t_max && temp > t_min){
             rec.t = temp;
+            rec.p = r.at(rec.t);
             vec3 outward_normal = (rec.p - center) / radius;
             rec.set_face_normal(r,outward_normal);
             return true;
