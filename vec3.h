@@ -4,6 +4,15 @@
 #include <iostream>
 #include <cmath>
 
+/*  Class: vec3
+ *  Function:
+ *      get: vec3.x y z
+ *      op -: vec3 = -vec3
+ *      op +: vec3 + vec3 = vec3
+ *      op *: vec3 * t = vec3
+ *      op /: vec3 = 1 / vec3
+ */
+
 class vec3 {
 public:
     vec3() : e{0,0,0} {}

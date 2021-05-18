@@ -2,8 +2,7 @@
 
 #include <iostream>
 
-/*
- *  Function: hit_sphere
+/*  Function: hit_sphere
  *  Input:
  *      center: sphere center point
  *      radius: sphere radius
@@ -24,40 +23,46 @@
  */
 double hit_sphere(const vec3& center,double radius,const ray& r) {
     vec3 oc = r.origin() - center;
-    auto a = dot(r.direction(),r.direction());
-    auto b = 2.0 * dot(oc,r.direction());
-    auto c = dot(oc,oc) - radius * radius;
-    auto discriminant = b * b - 4 * a * c;
+    auto a = dot(r.direction(),r.direction());  // a = vec(b) * vec(b)
+    auto b = 2.0 * dot(oc,r.direction());       // b = 2vec(b) * vec(a - c)
+    auto c = dot(oc,oc) - radius * radius;      // c = vec(a - c) * vec(a - c) - R * R
+    auto discriminant = b * b - 4 * a * c;      // delta = b^2 - 4ac
 
+    //The root doesn't exist : return -1.0
     if (discriminant < 0) {
         return -1.0;
     } else {
+    //The root exist : return root t;
         return (-b - std::sqrt(discriminant)) / (2.0 * a);
     }
 }
 
-/*
- *  Function: ray_color
+/*  Function: ray_color
  *  Input:
  *      ray: render ray with color
  *
  *  Output:
- *      color: lerp color br RGB
+ *      color: linear lerp color br RGB
  */
 
 vec3 ray_color(const ray& r) {
 
-    //The root ray hit sphere
+    //The root which ray hit sphere
     auto t = hit_sphere(vec3(0,0,-1),0.5,r);
 
+    //The root exist
     if (t > 0.0) {
+        //P: hit point r.at(t)    C: sphere center vec(0,0,-1)
         vec3 N = unit_vector(vec3(r.at(t) - vec3(0,0,-1)));
+
+        //From (-1,1) to (0,1)
         return 0.5 * vec3(N.x() + 1,N.y() + 1,N.z() + 1);
     }
 
     vec3 unit_direction = unit_vector(r.direction());
     t = 0.5 * (unit_direction.y() + 1.0);
 
+    //Linear lerp RGB color
     return (1.0 - t) * vec3(1.0,1.0,1.0) + t * vec3(0.5,0.7,1.0);
 }
 
@@ -75,6 +80,7 @@ int main() {
     vec3 origin(0.0,0.0,0.0);
 
     for (int j = image_height - 1; j >= 0; --j) {
+        //Add a progress indicator output
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
             auto u = double(i) / image_width;
