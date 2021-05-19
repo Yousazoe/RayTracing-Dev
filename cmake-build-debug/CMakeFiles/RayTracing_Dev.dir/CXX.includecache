@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/camera.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
@@ -19,6 +23,8 @@ vector
 -
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp
+camera.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/camera.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 hittable_list.h
