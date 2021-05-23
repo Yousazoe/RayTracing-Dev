@@ -92,6 +92,9 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>

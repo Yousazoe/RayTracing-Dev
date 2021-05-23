@@ -13,6 +13,8 @@ rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
 hittable.h
@@ -31,8 +33,18 @@ hittable_list.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
 sphere.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h
+material.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h
 iostream
 -
+memory
+-
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h
+ray.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
 vec3.h
@@ -53,6 +65,8 @@ vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h
+utility
+-
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 vec3.h
