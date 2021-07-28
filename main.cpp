@@ -11,14 +11,14 @@
 vec3 ray_color(const ray& r,const hittable& world,int depth) {
     hit_record rec;
 
-    if (depth == 0) return vec3(0,0,0);
+    if (depth == 0) return {0,0,0};
 
     if (world.hit(r,0.001,infinity,rec)){
         ray scattered;
         vec3 attenuation;
         if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
             return attenuation * ray_color(scattered, world, depth-1);
-        return vec3(0,0,0);
+        return {0,0,0};
     }
 
     vec3 unit_direction = unit_vector(r.direction());
@@ -38,15 +38,17 @@ int main() {
 
     // World
     hittable_list world;
-
+    
     world.add(make_shared<sphere>(
-            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.7, 0.3, 0.3))));
-
+            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
     world.add(make_shared<sphere>(
             vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
 
-    world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2),1.0)));
-    world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8),0.3)));
+    world.add(make_shared<sphere>(
+           vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2),0.0)));
+
+    world.add(make_shared<sphere>(
+            vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
 
     // Camera
     camera cam;
