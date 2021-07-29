@@ -35,10 +35,12 @@ int main() {
     const int image_height = 100;
     const int samples_per_pixel = 100;
     const int max_depth = 50;
+    const auto aspect_ratio = double(image_width) / image_height;
 
     // World
+    auto R = cos(pi / 4);
     hittable_list world;
-    
+
     world.add(make_shared<sphere>(
             vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
     world.add(make_shared<sphere>(
@@ -51,7 +53,7 @@ int main() {
             vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
 
     // Camera
-    camera cam;
+    camera cam = camera(vec3(-2, 2, 1), vec3(0, 0, -1), vec3(0, 1, 0), 20, aspect_ratio);
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
