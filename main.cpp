@@ -3,6 +3,7 @@
 
 #include "hittable_list.h"
 #include "sphere.h"
+#include "moving_sphere.h"
 #include "material.h"
 
 #include <iostream>
@@ -33,20 +34,22 @@ hittable_list random_scene() {
             vec3(0,-1000,0), 1000, make_shared<lambertian>(vec3(0.5, 0.5, 0.5))));
 
     int i = 1;
-    for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
+    for (int a = -10; a < 10; a++) {
+        for (int b = -10; b < 10; b++) {
             auto choose_mat = random_double();
             vec3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
             if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
                 if (choose_mat < 0.8) {
                     // diffuse
                     auto albedo = vec3::random() * vec3::random();
-                    world.add(
-                            make_shared<sphere>(center, 0.2, make_shared<lambertian>(albedo)));
+                    world.add(make_shared<moving_sphere>(
+                            center, center + vec3(0, random_double(0, 0.5), 0), 0.0, 1.0, 0.2,
+                            make_shared<lambertian>(albedo)));
+
                 } else if (choose_mat < 0.95) {
                     // metal
-                    auto albedo = vec3::random(.5, 1);
-                    auto fuzz = random_double(0, .5);
+                    auto albedo = vec3::random(0.5, 1);
+                    auto fuzz = random_double(0, 0.5);
                     world.add(
                             make_shared<sphere>(center, 0.2, make_shared<metal>(albedo, fuzz)));
                 } else {
@@ -77,21 +80,6 @@ int main() {
 
     // World
     auto world = random_scene();
-    //auto R = cos(pi / 4);
-    /*hittable_list world;
-
-    world.add(make_shared<sphere>(
-            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
-    world.add(make_shared<sphere>(
-            vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
-
-    world.add(make_shared<sphere>(
-           vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2),0.0)));
-
-    world.add(make_shared<sphere>(
-            vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
-    */
-
 
     // Camera
     vec3 lookfrom(13, 2, 3);
@@ -99,7 +87,8 @@ int main() {
     vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
     auto aperture = 0.1;
-    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+
+    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
