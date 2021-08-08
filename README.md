@@ -1231,3 +1231,1649 @@ int main() {
 
 
 这样我们就会得到一张使用法向作为球体颜色值的图片。当你想查看模型的特征细节与瑕疵时, 输出面法向作为颜色值不失为一种很好的方法。
+
+
+
+### 反走样
+
+> When a real camera takes a picture, there are usually no jaggies along edges because the edge pixels are a blend of some foreground and some background. We can get the same effect by averaging a bunch of samples inside each pixel. We will not bother with stratification. This is controversial, but is usual for my programs. For some ray tracers it is critical, but the kind of general one we are writing doesn’t benefit very much from it and it makes the code uglier. We abstract the camera class a bit so we can make a cooler camera later.
+
+真实世界中的摄像机拍摄出来的照片是没有像素状的锯齿的。因为边缘像素是由背景和前景混合而成的。我们也可以在程序中简单的对每个边缘像素多次采样取平均达到类似的效果。我们这里不会使用分层采样。尽管我自己常常在我的程序里使用这种有争议的方法。对某些光线追踪器来说分层采样是很关键的部分, 但是对于我们写的这个小光线追踪器并不会有什么很大的提升, 只会让代码更加丑陋。我们会在这里将摄像机类抽象一下, 以便于后续能有一个更酷的摄像机。
+
+> When a real camera takes a picture, there are usually no jaggies along edges because the edge pixels are a blend of some foreground and some background. We can get the same effect by averaging a bunch of samples inside each pixel. We will not bother with stratification. This is controversial, but is usual for my programs. For some ray tracers it is critical, but the kind of general one we are writing doesn’t benefit very much from it and it makes the code uglier. We abstract the camera class a bit so we can make a cooler camera later.
+
+我们还需要一个能够返回真随机数的一个随机数生成器。默认来说这个函数应该返回0≤r<1的随机数。注意这个范围取不到1是很重要的。有时候我们能从这个特性中获得好处。
+
+
+
+> A simple approach to this is to use the `rand()` function that can be found in `<cstdlib>`. This function returns a random integer in the range 0 and `RAND_MAX`. Hence we can get a real random number as desired with the following code snippet, added to `rtweekend.h`:
+
+一个简单的实现方法是, 使用`<cstdlib>`中的`rand()`函数。这个函数会返回0到RAND_MAX中的一个任意整数。我们将下面的一小段代码加到`rtweekend.h`中, 就能得到我们想要的随机函数了:
+
+```c++
+#include <cstdlib>
+...
+
+inline double random_double() {
+    // Returns a random real in [0,1).
+    return rand() / (RAND_MAX + 1.0);
+}
+
+inline double random_double(double min, double max) {
+    // Returns a random real in [min,max).
+    return min + (max-min)*random_double();
+}
+```
+
+
+
+> C++ did not traditionally have a standard random number generator, but newer versions of C++ have addressed this issue with the `<random>` header (if imperfectly according to some experts). If you want to use this, you can obtain a random number with the conditions we need as follows:
+
+传统C++并没有随机数生成器, 但是新版C++中的头实现了这个功能(某些专家觉得这种方法不太完美)。如果你想使用这种方法, 你可以参照下面的代码:
+
+```c++
+#include <functional>
+#include <random>
+
+inline double random_double() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator;
+    static std::function<double()> rand_generator =
+        std::bind(distribution, generator);
+    return rand_generator();
+}
+```
+
+
+
+> For a given pixel we have several samples within that pixel and send rays through each of the samples. The colors of these rays are then averaged:
+
+对于给定的像素, 我们发射多条射线进行多次采样。然后我们对颜色结果求一个平均值:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.07-pixel-samples.jpg)
+
+
+
+> Now's a good time to create a `camera` class to manage our virtual camera and the related tasks of scene scampling. The following class implements a simple camera using the axis-aligned camera from before:
+
+综上, 我们对我们的简单的轴对齐摄像机类进行了一次封装:
+
+```c++
+#ifndef CAMERA_H
+#define CAMERA_H
+
+#include "rtweekend.h"
+
+class camera {
+    public:
+        camera() {
+            lower_left_corner = vec3(-2.0, -1.0, -1.0);
+            horizontal = vec3(4.0, 0.0, 0.0);
+            vertical = vec3(0.0, 2.0, 0.0);
+            origin = vec3(0.0, 0.0, 0.0);
+        }
+
+        ray get_ray(double u, double v) {
+            return ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
+        }
+
+    public:
+        vec3 origin;
+        vec3 lower_left_corner;
+        vec3 horizontal;
+        vec3 vertical;
+};
+#endif
+```
+
+
+
+> To handle the multi-sampled color computation, we'll update the `write_color()` function. Rather than adding in a fractional contribution each time we accumulate more light to the color, just add the full color each iteration, and then perform a single divide at the end (by the number of samples) when writing out the color. In addition, we'll add a handy utility function to the `rtweekend.h` utility header: `clamp(x,min,max)`, which clamps the value `x` to the range [min,max]:
+
+为了对多重采样的颜色值进行计算, 我们升级了`vec3::write_color()`函数。我们不会在每次发出射线采样时都计算一个0-1之间的颜色值, 而是一次性把所有的颜色都加在一起, 然后最后只需要简单的一除(除以采样点个数)。另外, 我们给头文件`rtweekend.h`加入了一个新函数`clamp(x,min,max)`, 用来将`x`限制在[min,max]区间之中:
+
+```c++
+inline double clamp(double x, double min, double max) {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
+}
+```
+
+
+
+```c++
+void write_color(std::ostream &out, int samples_per_pixel) {
+    // Divide the color total by the number of samples.
+    auto scale = 1.0 / samples_per_pixel;
+    auto r = scale * e[0];
+    auto g = scale * e[1];
+    auto b = scale * e[2];
+
+    // Write the translated [0,255] value of each color component.
+    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+}
+```
+
+
+
+main函数也发生了变化:
+
+```c++
+#include "camera.h"
+
+......
+
+int main() {
+    const int image_width = 200;
+    const int image_height = 100;
+    const int samples_per_pixel = 100;
+
+    std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+
+    hittable_list world;
+    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
+    camera cam;
+    for (int j = image_height-1; j >= 0; --j) {
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+        for (int i = 0; i < image_width; ++i) {
+            vec3 color(0, 0, 0);
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = (i + random_double()) / image_width;
+                auto v = (j + random_double()) / image_height;
+                ray r = cam.get_ray(u, v);
+                color += ray_color(r, world);
+            }
+            color.write_color(std::cout, samples_per_pixel);
+        }
+    }
+
+    std::cerr << "\nDone.\n";
+}
+```
+
+
+
+这里的反走样算法主要是**SSAA（Supersampling Anti-Aliasing）**。SSAA可以说是图形学中最简单粗暴的反走样方法，但同时也最有效，它唯一也是致命的缺点是性能太差。任何类型的走样归根结底都是因为欠采样，那么我们只需要增加采样数，就可以减轻走样现象。这就是SSAA，所以SSAA简单的来说可以分三步：
+
+1. 在一个像素内取若干个子采样点
+2. 对子像素点进行颜色计算（采样）
+3. 根据子像素的颜色和位置，利用一个称之为resolve的合成阶段，计算当前像素的最终颜色输出
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/v2-940e167efe0b74854cf56082d084fbeb_720w.jpg)
+
+
+
+> Zooming into the image that is produced, we can see the difference in edge pixels.
+
+停, 放大放大再放大, 看啊, 每一个像素都是背景和前景的混合:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.06-antialias-before-after.png)
+
+
+
+
+
+### 漫反射材质
+
+> Now that we have objects and multiple rays per pixel, we can make some realistic looking materials. We’ll start with diffuse (matte) materials. One question is whether we mix and match geometry and materials (so we can assign a material to multiple spheres, or vice versa) or if geometry and material are tightly bound (that could be useful for procedural objects where the geometry and material are linked). We’ll go with separate — which is usual in most renderers — but do be aware of the limitation.
+
+既然我们已经有了物体的类和多重采样, 我们不妨再加入一些逼真的材质吧。我们先从漫反射材质开始。设计上的问题又来了:我们是把材质和物体设计成两个类, 这样就可以将材质赋值给物体类的成员变量, 还是说让它们紧密结合,这对于使用几何信息来生成纹理的程序来说是很便利的 。我们会采取将其分开的做法————实际上大多数的渲染器都是这样做的————但是记得注意的确是有两种设计方法的。
+
+
+
+> Diffuse objects that don’t emit light merely take on the color of their surroundings, but they modulate that with their own intrinsic color. Light that reflects off a diffuse surface has its direction randomized. So, if we send three rays into a crack between two diffuse surfaces they will each have different random behavior:
+
+漫反射材质不仅仅接受其周围环境的光线, 还会在散射时使光线变成自己本身的颜色。光线射入漫反射材质后, 其反射方向是随机的。所以如果我们为下面这两个漫发射的球射入三条光线, 光线都会有不同的反射角度:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.08-light-bounce.jpg)
+
+
+
+
+
+> They also might be absorbed rather than reflected. The darker the surface, the more likely absorption is. (That’s why it is dark!) Really any algorithm that randomizes direction will produce surfaces that look matte. One of the simplest ways to do this turns out to be exactly correct for ideal diffuse surfaces. (I used to do it as a lazy hack that approximates mathematically ideal Lambertian.)
+
+并且大部分的光线都会被吸收, 而不是被反射。表面越暗, 吸收就越有可能发生。我们使用任意的算法生成随机的反射方向, 就能让其看上去像一个粗糙不平的漫反射材质。这里我们采用最简单的算法就能得到一个理想的漫反射表面(其实是懒得写lambertian所以用了一个数学上近似的方法)。
+
+
+
+> (Reader Vassillen Chizhov proved that the lazy hack is indeed just a lazy hack and is inaccurate. The correct representation of ideal Lambertian isn't much more work, and is presented at the end of the chapter.)
+
+(读者Vassillen Chizhov 提供了这个方法, 虽然并不是很精确。我们会在章节最后提准确的lambertian表达式, 而且其并不会很复杂)
+
+
+
+> There are two unit radius spheres tangent to the hit point 𝑝p of a surface. These two spheres have a center of (**𝐏**+**𝐧**) and (**𝐏**−**𝐧**), where **𝐧**n is the normal of the surface. The sphere with a center at (**𝐏**−**𝐧**) is considered *inside* the surface, whereas the sphere with center (**𝐏**+**𝐧**) is considered *outside* the surface. Select the tangent unit radius sphere that is on the same side of the surface as the ray origin. Pick a random point **𝐒** inside this unit radius sphere and send a ray from the hit point **𝐏** to the random point **𝐒** (this is the vector (**𝐒**−**𝐏**)):
+
+好, 现在有两个单位球相切于点p, 这两个球体的球心为$(p+\vec N)$和$(p-\vec N)$, $\vec N$是球体表面的法向量。球心为$(p-\vec N)$的那个球在表面的内部, 球心为$(p+ \vec N)$的球在表面的外部。选择和光线原点位于表面同一侧的那个单位球, 并从球中随机选取一点s, 向量$(s−p)$就是我们要求的反射光线的方向:
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.09-rand-vec.jpg)
+
+
+
+> We need a way to pick a random point in a unit radius sphere. We’ll use what is usually the easiest algorithm: a rejection method. First, pick a random point in the unit cube where x, y, and z all range from −1 to +1. Reject this point and try again if the point is outside the sphere.
+
+我们需要一个算法来生成球体内的随机点。我们会采用最简单的做法:否定法(rejection method)。首先, 在一个xyz取值范围为-1到+1的单位立方体中选取一个随机点, 如果这个点在球外就重新生成直到该点在球内。
+
+在`vec3.h`中添加：
+
+```c++
+class vec3 {
+  public:
+    ...
+    inline static vec3 random() {
+        return vec3(random_double(), random_double(), random_double());
+    }
+
+    inline static vec3 random(double min, double max) {
+        return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
+    }
+}  
+ 
+......
+  
+inline vec3 random_in_unit_sphere() {
+    while (true) {
+        auto p = vec3::random(-1,1);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}  
+```
+
+
+
+> Then update the `ray_color()` function to use the new random direction generator:
+
+然后使用我们新的生成随机随机反射方向的函数来更新一下我们的`ray_color()`函数:
+
+```c++
+vec3 ray_color(const ray& r, const hittable& world) {
+    hit_record rec;
+
+    if (world.hit(r, 0, infinity, rec)) {
+        vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * ray_color(ray(rec.p, target - rec.p), world);
+    }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
+```
+
+
+
+> There's one potential problem lurking here. Notice that the `ray_color` function is recursive. When will it stop recursing? When it fails to hit anything. In some cases, however, that may be a long time — long enough to blow the stack. To guard against that, let's limit the maximum recursion depth, returning no light contribution at the maximum depth:
+
+
+
+这里还有个潜在的问题: 注意`ray_color`函数是一个递归函数。那么递归终止的条件是什么呢?当它没有击中任何东西。但是, 在某些条件下, 达到这个终止条件的时间会非常长, 长到足够爆了函数栈【译注:想象一下一条光线在一个镜子材质的密封的盒子(并不吸收光线)中反复折射, 永无尽头】。为了避免这种情况的发生, 我们使用一个变量`depth`限制递归层数。当递归层数达到限制值时我们终止递归, 返回黑色:【译注: 可以试试返回纯红(1,0,0), 然后渲染一下, 大致看一下是哪里在不停的发生散射】
+
+```diff
++vec3 ray_color(const ray& r, const hittable& world, int depth) {
++    hit_record rec;
+
++    // If we've exceeded the ray bounce limit, no more light is gathered.
++    if (depth <= 0)
++        return vec3(0,0,0);
+
++    if (world.hit(r, 0, infinity, rec)) {
++        vec3 target = rec.p + rec.normal + random_in_unit_sphere();
++        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
++   }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
+...
+int main() {
+    const int image_width = 200;
+    const int image_height = 100;
+    const int samples_per_pixel = 100;
++   const int max_depth = 50;
+
+    ...
+    for (int j = image_height-1; j >= 0; --j) {
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+        for (int i = 0; i < image_width; ++i) {
+            vec3 color(0, 0, 0);
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = (i + random_double()) / image_width;
+                auto v = (j + random_double()) / image_height;
+                ray r = cam.get_ray(u, v);
++               color += ray_color(r, world, max_depth);
+            }
+            color.write_color(std::cout, samples_per_pixel);
+        }
+    }
+
+    std::cerr << "\nDone.\n";
+}
+```
+
+
+
+> This gives us:
+
+我们会得到:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.07-first-diffuse.png)
+
+
+
+
+
+> Note the shadowing under the sphere. This picture is very dark, but our spheres only absorb half the energy on each bounce, so they are 50% reflectors. If you can’t see the shadow, don’t worry, we will fix that now. These spheres should look pretty light (in real life, a light grey). The reason for this is that almost all image viewers assume that the image is “gamma corrected”, meaning the 0 to 1 values have some transform before being stored as a byte. There are many good reasons for that, but for our purposes we just need to be aware of it. To a first approximation, we can use “gamma 2” which means raising the color to the power 1/𝑔𝑎𝑚𝑚𝑎, or in our simple case ½, which is just square-root:
+
+注意球下面是有影子的。这个图片非常的暗, 但是我们的球在散射的时候只吸收了一半的能量。如果你看不见这个阴影, 别担心, 我们现在来修复一下。现实世界中的这个球明显是应该更加亮一些的。这是因为所有的看图软件都默认图像已经经过了伽马校正(gamma corrected)。即在图片存入字节之前, 颜色值发生了一次转化。这么做有许多好处, 但这并不是我们这里所讨论的重点。我们使用”gamma 2”空间, 就意味着最终的颜色值要加上指数1/gamma, 在我们的例子里就是 ½, 即开平方根:
+
+```c++
+void write_color(std::ostream &out, int samples_per_pixel) {
+    // Divide the color total by the number of samples and gamma-correct
+    // for a gamma value of 2.0.
+    auto scale = 1.0 / samples_per_pixel;
+    auto r = sqrt(scale * e[0]);
+    auto g = sqrt(scale * e[1]);
+    auto b = sqrt(scale * e[2]);
+
+    // Write the translated [0,255] value of each color component.
+    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+}
+```
+
+
+
+> That yields light grey, as we desire:
+
+好了, 现在看上去更灰了, 如我们所愿:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.08-gamma-correct.png)
+
+
+
+> There’s also a subtle bug in there. Some of the reflected rays hit the object they are reflecting off of not at exactly 𝑡=0, but instead at 𝑡=−0.0000001 or 𝑡=0.00000001 or whatever floating point approximation the sphere intersector gives us. So we need to ignore hits very near zero:
+
+这里还有个不太重要的潜在bug。有些物体反射的光线会在t=0时再次击中自己。然而由于精度问题, 这个值可能是t=−0.000001或者是t=0.0000000001或者任意接近0的浮点数。所以我们要忽略掉0附近的一部分范围, 防止物体发出的光线再次与自己相交。【译注: 小心自相交问题】
+
+```c++
+if (world.hit(r, 0.001, infinity, rec)) {
+```
+
+
+
+> This gets rid of the shadow acne problem. Yes it is really called that.
+
+这样我们就能避免阴影痤疮(shadow ance)的产生。是滴, 这种现象的确是叫这个名字。
+
+
+
+> The rejection method presented here produces random points in the unit ball offset along the surface normal. This corresponds to picking directions on the hemisphere with high probability close to the normal, and a lower probability of scattering rays at grazing angles. This distribution scales by the cos3(𝜙) where 𝜙 is the angle from the normal. This is useful since light arriving at shallow angles spreads over a larger area, and thus has a lower contribution to the final color.
+
+拒绝法生成的点是单位球体积内的的随机点, 这样生成的向量大概率上会和法线方向相近, 并且极小概率会沿着入射方向反射回去。这个分布律的表达式有一个cos3(ϕ)cos3⁡(ϕ)的系数, 其中 ϕϕ 是反射光线距离法向量的夹角。这样当光线从一个离表面很小的角度射入时, 也会散射到一片很大的区域, 对最终颜色值的影响也会更低。
+
+
+
+> However, we are interested in a Lambertian distribution, which has a distribution of cos(𝜙). True Lambertian has the probability higher for ray scattering close to the normal, but the distribution is more uniform. This is achieved by picking random points on the surface of the unit sphere, offset along the surface normal. Picking random points on the unit sphere can be achieved by picking random points *in* the unit sphere, and then normalizing those.
+
+然而, 事实上的lambertian的分布律并不是这样的, 它的系数是cos(ϕ)cos⁡(ϕ)。真正的lambertian散射后的光线距离法相比较近的概率会更高, 但是分布律会更加均衡。这是因为我们选取的是单位球面上的点。我们可以通过在单位球内选取一个随机点, 然后将其单位化来获得该点。【译注: 然而下面的代码却用了极坐标的形式】
+
+```c++
+vec3 random_unit_vector() {
+    auto a = random_double(0, 2*pi);
+    auto z = random_double(-1, 1);
+    auto r = sqrt(1 - z*z);
+    return vec3(r*cos(a), r*sin(a), z);
+}
+```
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.10-rand-unitvec.png)
+
+
+
+> This `random_unit_vector()` is a drop-in replacement for the existing `random_in_unit_sphere()` function.
+
+我们使用新函数`random_unit_vector()`替换现存的`random_unit_sphere()`:
+
+```c++
+vec3 ray_color(const ray& r, const hittable& world, int depth) {
+    hit_record rec;
+
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if (depth <= 0)
+        return vec3(0,0,0);
+
+    if (world.hit(r, 0.001, infinity, rec)) {
+        vec3 target = rec.p + rec.normal + random_unit_vector();
+        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
+    }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
+```
+
+
+
+> After rendering we get a similar image:
+
+我们会得到这样的图片, 和之前很相像:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.09-correct-lambertian.png)
+
+
+
+> It's hard to tell the difference between these two diffuse methods, given that our scene of two spheres is so simple, but you should be able to notice two important visual differences:
+>
+> 1. The shadows are less pronounced after the change
+> 2. Both spheres are lighter in appearance after the change
+>
+> Both of these changes are due to the more uniform scattering of the light rays, fewer rays are scattering toward the normal. This means that for diffuse objects, they will appear *lighter* because more light bounces toward the camera. For the shadows, less light bounces straight-up, so the parts of the larger sphere directly underneath the smaller sphere are brighter.
+
+我们的场景太简单, 区分这两种方法是比较难的。但你应该能够注意到视觉上的一些差异:
+
+1.阴影部分少了
+2.大球和小球都变亮了
+
+这些变化都是由散射光线的单位规整化引起的, 现在更少的光线会朝着发现方向散射。对于漫发射的物体来说, 他们会变得更亮。因为更多光线朝着摄像机反射。对于阴影部分来说, 更少的光线朝上反射, 所以小球下方的大球区域会变得更加明亮。
+
+
+
+
+
+> The initial hack presented in this book lasted a long time before it was proven to be an incorrect approximation of ideal Lambertian diffuse. A big reason that the error persisted for so long is that it can be difficult to:
+>
+> 1. Mathematically prove that the probability distribution is incorrect
+> 2. Intuitively explain why a cos(𝜙) distribution is desirable (and what it would look like)
+>
+> Not a lot of common, everyday objects are perfectly diffuse, so our visual intuition of how these objects behave under light can be poorly formed.
+
+这本书很长一段时间都采用的是先前的版本, 直到后来有一天大家发现它其实只是理想lambertian漫发射的近似, 其并不正确。这个错误在本书中留存了那么长时间, 主要是因为:
+
+1.概率分布的数学证明算错了
+2.视觉上来说, 并不能直接看出cos(ϕ)的概率分配是我们所需要的
+
+因为大家日常生活中的物体都是发生了完美的漫反射, 所以我们很难养成对光照下物体是如何表现的视觉直觉。
+
+
+
+> In the interest of learning, we are including an intuitive and easy to understand diffuse method. For the two methods above we had a random vector, first of random length and then of unit length, offset from the hit point by the normal. It may not be immediately obvious why the vectors should be displaced by the normal.
+
+为了便于大家理解, 简单来说两种方法都选取了一个随机方向的向量, 不过一种是从单位球体内取的, 其长度是随机的, 另一种是从单位球面上取的, 长度固定为单位向量长度。为什么要采取单位球面并不是能很直观的一眼看出。
+
+
+
+> A more intuitive approach is to have a uniform scatter direction for all angles away from the hit point, with no dependence on the angle from the normal. Many of the first raytracing papers used this diffuse method (before adopting Lambertian diffuse).
+
+另一种具有启发性的方法是, 直接从入射点开始选取一个随机的方向, 然后再判断是否在法向量所在的那个半球。在使用lambertian漫发射模型前, 早期的光线追踪论文中大部分使用的都是这个方法:
+
+```c++
+vec3 random_in_hemisphere(const vec3& normal) {
+    vec3 in_unit_sphere = random_in_unit_sphere();
+    if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return in_unit_sphere;
+    else
+        return -in_unit_sphere;
+}
+```
+
+
+
+
+
+将我们的新函数套入`ray_color()`函数:
+
+```c++
+vec3 ray_color(const ray& r, const hittable& world, int depth) {
+    hit_record rec;
+
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if (depth <= 0)
+        return vec3(0,0,0);
+
+    if (world.hit(r, 0.001, infinity, rec)) {
+        vec3 target = rec.p + random_in_hemisphere(rec.normal);
+        return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
+    }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
+```
+
+
+
+> Gives us the following image:
+
+我们会得到如下的图片:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.10-rand-hemispherical.png)
+
+
+
+> Scenes will become more complicated over the course of the book. You are encouraged to switch between the different diffuse renderers presented here. Most scenes of interest will contain a disproportionate amount of diffuse materials. You can gain valuable insight by understanding the effect of different diffuse methods on the lighting of the scene.
+
+我们的场景会随着本书的深入会变得越来越复杂。这里鼓励大家在之后都试一下这几种不同的漫反射渲染法。大多数场景都会有许多的漫反射材质。你可以从中培养出你对这几种方法的敏感程度。
+
+
+
+
+
+### 金属材质
+
+> If we want different objects to have different materials, we have a design decision. We could have a universal material with lots of parameters and different material types just zero out some of those parameters. This is not a bad approach. Or we could have an abstract material class that encapsulates behavior. I am a fan of the latter approach. For our program the material needs to do two things:
+>
+> 1. Produce a scattered ray (or say it absorbed the incident ray).
+> 2. If scattered, say how much the ray should be attenuated.
+>
+> This suggests the abstract class:
+
+如果我们想让不同的物体能拥有不同的材质, 我们又面临着一个设计上的抉择。我们可以设计一个宇宙无敌大材质, 这个材质里面有数不胜数的参数和材质类型可供选择。这样其实也不错, 但我们还可以设计并封装一个抽象的材质类。我反正喜欢后面一种, 对于我们的程序来说, 一个材质类应该封装两个功能进去:
+
+1.生成散射后的光线(或者说它吸收了入射光线)
+2.如果发生散射, 决定光线会变暗多少(attenuate)
+
+下面来看一下这个抽象类:
+
+```c++
+class material {
+    public:
+        virtual bool scatter(
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+        ) const = 0;
+};
+```
+
+
+
+> The `hit_record` is to avoid a bunch of arguments so we can stuff whatever info we want in there. You can use arguments instead; it’s a matter of taste. Hittables and materials need to know each other so there is some circularity of the references. In C++ you just need to alert the compiler that the pointer is to a class, which the “class material” in the hittable class below does:
+
+
+
+我们在函数中使用hit_record作为传入参数, 就可以不用传入一大堆变量了。当然如果你想传一堆变量进去的话也行。这也是个人喜好。当然物体和材质还要能够联系在一起。在C++中你只要告诉编译器, 我们在`hit_record`里面存了个材质的指针。
+
+```c++
+#ifndef HITTABLE_H
+#define HITTABLE_H
+
+#include "rtweekend.h"
+#include "ray.h"
+class material;
+
+struct hit_record {
+    vec3 p;
+    vec3 normal;
+    shared_ptr<material> mat_ptr;
+    double t;
+    bool front_face;
+
+
+    inline void set_face_normal(const ray& r, const vec3& outward_normal) {
+        front_face = dot(r.direction(), outward_normal) < 0;
+        normal = front_face ? outward_normal :-outward_normal;
+    }
+};
+
+class hittable {
+    public:
+        virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;
+};
+
+#endif
+```
+
+
+
+> What we have set up here is that material will tell us how rays interact with the surface. `hit_record` is just a way to stuff a bunch of arguments into a struct so we can send them as a group. When a ray hits a surface (a particular sphere for example), the material pointer in the `hit_record` will be set to point at the material pointer the sphere was given when it was set up in `main()` when we start. When the `ray_color()` routine gets the `hit_record` it can call member functions of the material pointer to find out what ray, if any, is scattered.
+>
+> To achieve this, we must have a reference to the material for our sphere class to returned within `hit_record`. See the highlighted lines below:
+
+光线会如何与表面交互是由具体的材质所决定的。`hit_record`在设计上就是为了把一堆要传的参数给打包在了一起。当光线射入一个表面(比如一个球体), `hit_record`中的材质指针会被球体的材质指针所赋值, 而球体的材质指针是在`main()`函数中构造时传入的。当`color()`函数获取到`hit_record`时, 他可以找到这个材质的指针, 然后由材质的函数来决定光线是否发生散射, 怎么散射。
+
+所以我们必须在球体的构造函数和变量区域中加入材质指针, 以便之后传给`hit_record`。见下面高亮的代码行:
+
+```diff
+class sphere: public hittable {
+    public:
+        sphere() {}
++       sphere(vec3 cen, double r, shared_ptr<material> m)
++           : center(cen), radius(r), mat_ptr(m) {};
+
+        virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const;
+
+    public:
+        vec3 center;
+        double radius;
++       shared_ptr<material> mat_ptr;
+};
+
+bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
+    vec3 oc = r.origin() - center;
+    auto a = r.direction().length_squared();
+    auto half_b = dot(oc, r.direction());
+    auto c = oc.length_squared() - radius*radius;
+    auto discriminant = half_b*half_b - a*c;
+
+    if (discriminant > 0) {
+        auto root = sqrt(discriminant);
+        auto temp = (-half_b - root)/a;
+        if (temp < t_max && temp > t_min) {
+            rec.t = temp;
+            rec.p = r.at(rec.t);
+            vec3 outward_normal = (rec.p - center) / radius;
+            rec.set_face_normal(r, outward_normal);
+            rec.mat_ptr = mat_ptr;
+            return true;
+        }
+        temp = (-half_b + root) / a;
+        if (temp < t_max && temp > t_min) {
+            rec.t = temp;
+            rec.p = r.at(rec.t);
+            vec3 outward_normal = (rec.p - center) / radius;                
+            rec.set_face_normal(r, outward_normal);
++           rec.mat_ptr = mat_ptr;
+            return true;
+        }
+    }
+    return false;
+}
+```
+
+
+
+> For the Lambertian (diffuse) case we already have, it can either scatter always and attenuate by its reflectance 𝑅R, or it can scatter with no attenuation but absorb the fraction 1−𝑅1−R of the rays, or it could be a mixture of those strategies. For Lambertian materials we get this simple class:
+
+对于我们之前写过的Lambertian(漫反射)材质来说, 这里有两种理解方法, 要么是光线永远发生散射, 每次散射衰减至R, 要么是光线并不衰减, 转而物体吸收(1-R)的光线。你也可以当成是这两种的结合。于是我们可以写出Lambertian的材质类:
+
+```c++
+class lambertian : public material {
+    public:
+        lambertian(const vec3& a) : albedo(a) {}
+
+        virtual bool scatter(
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+        ) const {
+            vec3 scatter_direction = rec.normal + random_unit_vector();
+            scattered = ray(rec.p, scatter_direction);
+            attenuation = albedo;
+            return true;
+        }
+
+    public:
+        vec3 albedo;
+};
+```
+
+
+
+> Note we could just as well only scatter with some probability 𝑝 and have attenuation be 𝑎𝑙𝑏𝑒𝑑𝑜/𝑝. Your choice.
+>
+> If you read the code above carefully, you'll notice a small chance of mischief. If the random unit vector we generate is exactly opposite the normal vector, the two will sum to zero, which will result in a zero scatter direction vector. This leads to bad scenarios later on (infinities and NaNs), so we need to intercept the condition before we pass it on.
+>
+> For smooth metals the ray won’t be randomly scattered. The key math is: how does a ray get reflected from a metal mirror? Vector math is our friend here:
+
+注意我们也可以让光线根据一定的概率p发生散射【译注: 若判断没有散射, 光线直接消失】, 并使光线的衰减率(代码中的attenuation)为albedo/p。随你的喜好来。
+
+对于光滑的金属材质来说, 光线是不会像漫反射那样随机散射的, 而是产生反射。关键是:对于一个金属状的镜子, 光线具体是怎么反射的呢?向量数学是我们的好朋友:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.11-reflection.jpg)
+
+
+
+> The reflected ray direction in red is just $v+2b$. In our design, **𝐧** is a unit vector, but **𝐯** may not be. The length of **𝐛** should be $v⋅n$. Because **𝐯** points in, we will need a minus sign, yielding:
+
+反射方向的向量如图所示为$\vec V + 2\vec B$, 其中我们规定向量$\vec N$是单位向量, 但$\vec V$不一定是。向量B的长度应为$\vec V \cdot \vec N$, 因为向量$V$与向量$N$的方向相反, 这里我们需要再加上一个负号, 于是有:
+
+```c++
+vec3 reflect(const vec3& v, const vec3& n) {
+    return v - 2*dot(v,n)*n;
+}
+```
+
+
+
+> The metal material just reflects rays using that formula:
+
+金属材质使用上面的公式来计算反射方向:
+
+```c++
+class metal : public material {
+    public:
+        metal(const vec3& a) : albedo(a) {}
+
+        virtual bool scatter(
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+        ) const {
+            vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
+            scattered = ray(rec.p, reflected);
+            attenuation = albedo;
+            return (dot(scattered.direction(), rec.normal) > 0);
+        }
+
+    public:
+        vec3 albedo;
+};
+```
+
+
+
+> We need to modify the `ray_color()` function to use this:
+
+我们还需要修改一下color函数:
+
+```diff
+vec3 ray_color(const ray& r, const hittable& world, int depth) {
+    hit_record rec;
+
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if (depth <= 0)
+        return vec3(0,0,0);
+
+    if (world.hit(r, 0.001, infinity, rec)) {
++       ray scattered;
++       vec3 attenuation;
++       if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
++           return attenuation * ray_color(scattered, world, depth-1);
++       return vec3(0,0,0);
+    }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto t = 0.5*(unit_direction.y() + 1.0);
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
+```
+
+
+
+
+
+现在我们给场景加入一些金属球:
+
+```diff
+int main() {
+    const int image_width = 200;
+    const int image_height = 100;
+    const int samples_per_pixel = 100;
+    const int max_depth = 50;
+
+    std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+
++   hittable_list world;
+
++   world.add(make_shared<sphere>(
++       vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.7, 0.3, 0.3))));
++
++   world.add(make_shared<sphere>(
++       vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
+
++   world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2))));
++   world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8))));
+
+    camera cam;
+    for (int j = image_height-1; j >= 0; --j) {
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
+        for (int i = 0; i < image_width; ++i) {
+            vec3 color(0, 0, 0);
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = (i + random_double()) / image_width;
+                auto v = (j + random_double()) / image_height;
+                ray r = cam.get_ray(u, v);
+                color += ray_color(r, world, max_depth);
+            }
+            color.write_color(std::cout, samples_per_pixel);
+        }
+    }
+
+    std::cerr << "\nDone.\n";
+}
+```
+
+
+
+我们就能得到这样的图片:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.11-metal-shiny.png)
+
+> We can also randomize the reflected direction by using a small sphere and choosing a new endpoint for the ray:
+
+我们还可以给反射方向加入一点点随机性, 只要在算出反射向量后, 在其终点为球心的球内随机选取一个点作为最终的终点:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.12-reflect-fuzzy.jpg)
+
+
+
+> The bigger the sphere, the fuzzier the reflections will be. This suggests adding a fuzziness parameter that is just the radius of the sphere (so zero is no perturbation). The catch is that for big spheres or grazing rays, we may scatter below the surface. We can just have the surface absorb those.
+
+当然这个球越大, 金属看上去就更加模糊(fuzzy, 或者说粗糙)。所以我们这里引入一个变量来表示模糊的程度(fuzziness)(所以当fuzz=0时不会产生模糊)。如果fuzz, 也就是随机球的半径很大, 光线可能会散射到物体内部去。这时候我们可以认为物体吸收了光线。
+
+```diff
+class metal : public material {
+    public:
++       metal(const vec3& a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
+
+        virtual bool scatter(
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+        ) const {
+            vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
++           scattered = ray(rec.p, reflected + fuzz*random_in_unit_sphere());
+            attenuation = albedo;
+            return (dot(scattered.direction(), rec.normal) > 0);//dot<0我们认为吸收
+        }
+
+    public:
+        vec3 albedo;
++       double fuzz;
+};
+```
+
+
+
+
+
+我们可以将模糊值设置为0.3和1.0, 图片会变成这样:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.12-metal-fuzz.png)
+
+
+
+
+
+
+
+### 绝缘体材质
+
+> Clear materials such as water, glass, and diamonds are dielectrics. When a light ray hits them, it splits into a reflected ray and a refracted (transmitted) ray. We’ll handle that by randomly choosing between reflection or refraction, and only generating one scattered ray per interaction.
+
+透明的材料, 例如水, 玻璃, 和钻石都是绝缘体。当光线击中这类材料时, 一条光线会分成两条, 一条发生反射, 一条发生折射。我们会采取这样的策略: 每次光线与物体相交时, 要么反射要么折射, 一次只发生一种情况,随机选取。反正最后采样次数多, 会给这些结果取个平均值。
+
+折射部分是最难去debug的部分。我常常一开始让所有的光线只发生折射来调试。在这个项目中, 我加入了两个这样的玻璃球, 并且得到下图(我还没教你怎么弄出这样的玻璃球, 你先往下读, 一会儿你就知道了):
+
+<img src="https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.13-glass-first.png" style="zoom: 200%;" />
+
+> Is that right? Glass balls look odd in real life. But no, it isn’t right. The world should be flipped upside down and no weird black stuff. I just printed out the ray straight through the middle of the image and it was clearly wrong. That often does the job.
+
+这图看上去是对的么? 玻璃球在现实世界中看上去和这差不多。但是, 其实这图不对。玻璃球应该会翻转上下, 也不会有这种奇怪的黑圈。我输出了图片中心的一条光线来debug, 发现它完全错了, 你调试的时候也可以这样来。
+
+
+
+> The refraction is described by Snell’s law:
+>
+> $𝜂⋅sin𝜃=𝜂′⋅sin𝜃′$
+>
+> Where 𝜃 and 𝜃′ are the angles from the normal, and 𝜂 and 𝜂′ (pronounced “eta” and “eta prime”) are the refractive indices (typically air = 1.0, glass = 1.3–1.7, diamond = 2.4). The geometry is:
+
+折射法则是由Snell法则定义的：
+
+$𝜂⋅sin𝜃=𝜂^′⋅sin𝜃^′$​
+
+θ与θ′是入射光线与折射光线距离法相的夹角,η与η′(读作eta和eta prime)是介质的折射率(规定空气为1.0, 玻璃为1.3-1.7,钻石为2.4), 如图:
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.13-refraction.jpg)
+
+
+
+
+
+> In order to determine the direction of the refracted ray, we have to solve for sin𝜃′:
+>
+> $sin𝜃′= \frac{𝜂}{𝜂′}⋅sin𝜃$
+
+为了解出折射光线的方向, 我们需要解出sinθ:
+
+$sin𝜃′= \frac{𝜂}{𝜂′}⋅sin𝜃$
+
+
+
+> On the refracted side of the surface there is a refracted ray **𝐑**′ and a normal **𝐧**′, and there exists an angle, 𝜃′, between them. We can split **𝐑**′ into the parts of the ray that are perpendicular to **𝐧**′ and parallel to **𝐧**′:
+>
+> $ \mathbf{R’} = \mathbf{R’}_{\bot} + \mathbf{R’}_{\parallel}$​
+>
+> If we solve for **𝐑**′⊥ and **𝐑**′∥ we get:
+>
+> $ \mathbf{R’}_{\bot} = \frac{𝜂}{𝜂′}(\mathbf{R} + \cos \theta)\mathbf{n}$
+>
+> $ \mathbf{R’}_{\parallel} = -\sqrt{1 - |\mathbf{R’}_{\bot}|^2} \mathbf{n} $
+
+在折射介质部分有射线光线R′与法向量N′, 它们的夹角为θ′。我们可以把光线R′分解成垂直和水平与法向量N′的两个向量:
+
+$ \mathbf{R’} = \mathbf{R’}_{\bot} + \mathbf{R’}_{\parallel}$
+
+如果要解出这两个向量, 有:
+
+$ \mathbf{R’}_{\bot} = \frac{𝜂}{𝜂′}(\mathbf{R} + \cos \theta)\mathbf{n}$
+
+$ \mathbf{R’}_{\parallel} = -\sqrt{1 - |\mathbf{R’}_{\bot}|^2} \mathbf{n} $
+
+
+
+> You can go ahead and prove this for yourself if you want, but we will treat it as fact and move on. The rest of the book will not require you to understand the proof.
+
+你可以自己推导,证明。我们这里先直接拿来当结论用了。这本书有些别的地方也是, 并不需要你完全会证明。【译注: 自己推推也没坏处】
+
+
+
+> We still need to solve for cos𝜃cos⁡θ. It is well known that the dot product of two vectors can be explained in terms of the cosine of the angle between them:
+>
+> $a⋅b=|a||b|\cosθ$
+>
+> If we restrict **𝐚** and **𝐛** to be unit vectors:
+>
+> $a⋅b=\cos𝜃$​​
+>
+> We can now rewrite **𝐑**′⊥ in terms of known quantities:
+>
+> $𝐑^′_⊥=\frac{𝜂}{𝜂′}(𝐑+(−𝐑⋅𝐧)𝐧)$
+
+然后我们来解cosθ, 下面是著名的点乘的公式定义:
+
+$a⋅b=|a||b|\cosθ$​​
+
+如果我们将 $a$ 与 $b$ 归一化为单位向量:
+
+$a⋅b=\cos𝜃$​​
+
+于是我们可以这样表达垂直的那个向量:
+
+$𝐑^′_⊥=\frac{𝜂}{𝜂′}(𝐑+(−𝐑⋅𝐧)𝐧)$
+
+根据上述公式, 我们就能写出计算折射光线R′的函数:
+
+```c++
+vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
+    auto cos_theta = dot(-uv, n);
+    vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
+    vec3 r_out_perp = - sqrt(fabs(1.0 - r_out_parallel.length_squared())) * n;
+    return r_out_parallel + r_out_perp;
+}
+```
+
+
+
+回到 `main.cpp` 中更改：
+
+```diff
+    // World
+    hittable_list world;
+
+    world.add(make_shared<sphere>(
+            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.7, 0.3, 0.3))));
+    world.add(make_shared<sphere>(
+            vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
+
++   world.add(make_shared<sphere>(
++           vec3(1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+    
++   world.add(make_shared<sphere>(
++           vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+```
+
+
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.14-glass-always-refract.png)
+
+
+
+
+
+> That definitely doesn't look right. One troublesome practical issue is that when the ray is in the material with the higher refractive index, there is no real solution to Snell’s law, and thus there is no refraction possible. If we refer back to Snell's law and the derivation of sin𝜃′:
+>
+> $\sin𝜃^′=\frac{𝜂}{𝜂′}⋅\sin𝜃$​​
+>
+> If the ray is inside glass and outside is air (𝜂=1.5 and 𝜂′=1.0):
+>
+> $\sin𝜃^′=\frac{1.5}{1.0}⋅\sin𝜃$​
+>
+> The value of sin𝜃′sin⁡θ′ cannot be greater than 1. So, if,
+>
+> $\frac{1.5}{1.0}⋅\sin𝜃>1.0$​
+>
+> the equality between the two sides of the equation is broken, and a solution cannot exist. If a solution does not exist, the glass cannot refract, and therefore must reflect the ray:
+
+现在看上去图好像不太对, 这是因为当光线从高折射律介质射入低折射率介质时, 对于上述的Snell方程可能没有实解【sinθ>1】。这时候就不会发生折射, 所以就会出现许多小黑点。我们回头看一下snell法则的式子:
+
+$\sin𝜃^′=\frac{𝜂}{𝜂′}⋅\sin𝜃$​​
+
+如果光线从玻璃(η=1.5)射入空气(η=1.0)
+
+$\sin𝜃^′=\frac{1.5}{1.0}⋅\sin𝜃$​
+
+又因为sinθ′sin⁡θ′是不可能比1大的,所以一旦这种情况发生了:
+
+$\frac{1.5}{1.0}⋅\sin𝜃>1.0$​
+
+那就完蛋了, 方程无解了。所以我们认为光线无法发生折射的时候, 它发生了反射:
+
+```c++
+if(etai_over_etat * sin_theta > 1.0) {
+    // Must Reflect
+    ...
+}
+else {
+    // Can Refract
+    ...
+}
+```
+
+
+
+> Here all the light is reflected, and because in practice that is usually inside solid objects, it is called “total internal reflection”. This is why sometimes the water-air boundary acts as a perfect mirror when you are submerged.
+>
+> We can solve for `sin_theta` using the trigonometric qualities:
+>
+> $\sinθ=\sqrt{1−\cos{2θ}}$
+>
+> and
+>
+> $\cosθ = R ⋅ N$
+
+
+
+这里所有的光线都不发生折射, 转而发生了反射。因为这种情况常常在实心物体的内部发生, 所以我们称这种情况被称为”全内反射”。这也当你浸入水中时, 你发现水与空气的交界处看上去像一面镜子的原因。
+
+我们可以用三角函数解出 `sin_theta`：
+
+$\sinθ=\sqrt{1−\cos{2θ}}$​
+
+其中的 `cos_theta` 为：
+
+$\cosθ = R ⋅ N$
+
+```c++
+double cos_theta = ffmin(dot(-unit_direction, rec.normal), 1.0);
+double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+if(etai_over_etat * sin_theta > 1.0) {
+    // Must Reflect
+    ...
+}
+else {
+    // Can Refract
+    ...
+}
+```
+
+
+
+> And the dielectric material that always refracts (when possible) is:
+
+一个在可以偏折的情况下总是偏折, 其余情况发生反射的绝缘体材质为:
+
+```diff
+class dielectric : public material {
+public:
+    dielectric(double ri) : ref_idx(ri) {}
+
+    virtual bool scatter (
+            const ray& r_in,const hit_record& rec,vec3& attenuation,ray& scattered
+    ) const {
+        double etai_over_etat;
+        attenuation = vec3(1.0, 1.0, 1.0);
+
+        if (rec.front_face) {
+            etai_over_etat = 1 / ref_idx;
+        } else {
+            etai_over_etat = ref_idx;
+        }
+
+        vec3 unit_direction = unit_vector(r_in.direction());
++       double cos_theta = ffmin(dot(-unit_direction, rec.normal), 1.0);
++       double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+
++       if (etai_over_etat * sin_theta > 1.0) {
++           vec3 reflected = reflect(unit_direction, rec.normal);
++           scattered = ray(rec.p, reflected);
++           return true;
++       }
+
+        vec3 refracted = refract(unit_direction, rec.normal, etai_over_etat);
+        scattered = ray(rec.p, refracted);
+
+        return true;
+    }
+public:
+    double ref_idx;
+};
+```
+
+
+
+> Attenuation is always 1 — the glass surface absorbs nothing. If we try that out with these parameters:
+
+这里的光线衰减率为1——就是不衰减, 玻璃表面不吸收光的能量。如果我们使用下面的参数:
+
+```c++
+    // World
+    hittable_list world;
+
+    world.add(make_shared<sphere>(
+            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
+    world.add(make_shared<sphere>(
+            vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
+
+    world.add(make_shared<sphere>(
+           vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2),0.0)));
+
+    world.add(make_shared<sphere>(
+            vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+
+```
+
+
+
+> We get:
+
+我们会得到:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.15-glass-sometimes-refract.png)
+
+
+
+> Now real glass has reflectivity that varies with angle — look at a window at a steep angle and it becomes a mirror. There is a big ugly equation for that, but almost everybody uses a cheap and surprisingly accurate polynomial approximation by Christophe Schlick. This yields our full glass material:
+
+现实世界中的玻璃, 发生折射的概率会随着入射角而改变——从一个很狭窄的角度去看玻璃窗, 它会变成一面镜子。这个式子又丑又长, 好在我们有个数学上近似的等式, 它是由Christophe Schlick提出的:
+
+```c++
+double schlick(double cosine, double ref_idx) {
+    auto r0 = (1-ref_idx) / (1+ref_idx);
+    r0 = r0*r0;
+    return r0 + (1-r0)*pow((1 - cosine),5);
+}
+```
+
+
+
+这里有个简单又好用的trick, 如果你将球的半径设为负值, 形状看上去并没什么变化, 但是法相全都翻转到内部去了。所以就可以用这个特性来做出一个通透的玻璃球:【把一个小球套在大球里, 光线发生两次折射, 于是负负得正, 上下不会颠倒】:
+
+```c++
+world.add(make_shared<sphere>(vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
+world.add(make_shared<sphere>(
+    vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
+world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2), 0.3)));
+world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+world.add(make_shared<sphere>(vec3(-1,0,-1), -0.45, make_shared<dielectric>(1.5)));
+```
+
+
+
+
+
+
+
+
+
+### 可自定义位置的摄像机
+
+> Cameras, like dielectrics, are a pain to debug. So I always develop mine incrementally. First, let’s allow an adjustable field of view (*fov*). This is the angle you see through the portal. Since our image is not square, the fov is different horizontally and vertically. I always use vertical fov. I also usually specify it in degrees and change to radians inside a constructor — a matter of personal taste.
+
+摄像机总是和绝缘体一样难以debug。所以我总是一步步搭建我的摄像机类。首先, 我们使摄像机能调整其视野范围(field of view, fov)。fov是你的视角。因为我们的图片不是方的, 所以垂直和水平的fov值是不同的。我总是使用垂直方向的fov。并且我总是使用角度制来传参, 在构造函数中再将其转化为弧度——这也是我的个人喜好。
+
+
+
+> I first keep the rays coming from the origin and heading to the 𝑧=−1 plane. We could make it the 𝑧=−2 plane, or whatever, as long as we made ℎh a ratio to that distance. Here is our setup:
+
+首先我让射线从原点射向z=−1平面。我们当然也可以让其射向z=−2的平面,或者其他的什么值都行, 反正h和这个距离d是成比例的。
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.14-cam-view-geom.jpg)
+
+
+
+> This implies $ℎ=\tan(\frac{𝜃}{2})$​. Our camera now becomes:
+
+显然, $h=\tan(\frac{θ}{2})$。我们的摄像机类现在变成:
+
+```diff
+#ifndef RAYTRACING_DEV_CAMERA_H
+#define RAYTRACING_DEV_CAMERA_H
+
+#include "rtweekend.h"
+
+class camera {
+public:
+    camera() {
+        lower_left_corner = vec3(-2.0,-1.0,-1.0);
+        horizontal = vec3(4.0,0.0,0.0);
+        vertical = vec3(0.0,2.0,0.0);
+        origin = vec3(0.0,0.0,0.0);
+    }
+
++   camera(double vfov, double aspect) { // top to bottom, in degress
++       origin = vec3(0.0, 0.0, 0.0);
+
++       auto theta = degree_to_radians(vfov);
++       auto half_height = tan(theta / 2);
++       auto half_width = aspect * half_height;
+
++       lower_left_corner = vec3(-half_width, -half_height, -1.0);
+
++       horizontal = vec3(2 * half_width, 0.0, 0.0);
++       vertical = vec3(0.0, 2 * half_height, 0.0);
++   }
+
+    ray get_ray(double u,double v) {
+        return ray(origin,lower_left_corner + u * horizontal + v * vertical - origin);
+    }
+
+public:
+    vec3 origin;
+    vec3 lower_left_corner;
+    vec3 horizontal;
+    vec3 vertical;
+};
+
+#endif //RAYTRACING_DEV_CAMERA_H
+```
+
+
+
+> When calling it with camera `cam(90, aspect_ratio)` and these spheres:
+
+当我们使用一个`cam(90, double(image_width)/image_height)`的摄像机去拍下面的球:
+
+```c++
+    // World
+    auto R = cos(pi / 4);
+    hittable_list world;
+
+    world.add(make_shared<sphere>(
+            vec3(-R, 0, -1), R, make_shared<lambertian>(vec3(0, 0, 1))));
+    world.add(make_shared<sphere>(
+            vec3(R, 0, -1), R, make_shared<lambertian>(vec3(1, 0, 0))));
+
+```
+
+
+
+我们会得到:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.17-wide-view.png)
+
+
+
+
+
+> To get an arbitrary viewpoint, let’s first name the points we care about. We’ll call the position where we place the camera *lookfrom*, and the point we look at *lookat*. (Later, if you want, you could define a direction to look in instead of a point to look at.)
+>
+> We also need a way to specify the roll, or sideways tilt, of the camera: the rotation around the lookat-lookfrom axis. Another way to think about it is that even if you keep `lookfrom` and `lookat` constant, you can still rotate your head around your nose. What we need is a way to specify an “up” vector for the camera. This up vector should lie in the plane orthogonal to the view direction.
+
+为了能将我们的摄像机设置在任意位置, 我们先来给这个位置点起个名字。我们管摄像机所在的这个位置叫做 `lookfrom` , 我们看向的点叫做`lookat`(如果你不想用世界坐标下的点, 想用向量来表示这个方向的话也完全ok)。
+
+我们还需要一个变量去描述摄像机的倾斜程度, 或者说摄像机绕着轴`lookfrom - lookat`旋转的角度【想象下图中红色平面绕这个轴旋转】。就好比你站直了, 但是你的头还是可以左右转动。为了去描述这个倾斜程度, 我们需要一个向量来指定摄像机坐标系的正上方方向(up vector)。这里注意:这个向量就在视线方向正交投影过来的那个平面上:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.15-cam-view-dir.jpg)
+
+
+
+> We can actually use any up vector we want, and simply project it onto this plane to get an up vector for the camera. I use the common convention of naming a “view up” (*vup*) vector. A couple of cross products, and we now have a complete orthonormal basis (𝑢,𝑣,𝑤) to describe our camera’s orientation.
+
+我们可以使用任意的方向向量, 将其投影到上图的平面中来获得摄像机的up vector。我这里给他起名叫vup向量。经过一系列的点乘操作, 我们会有完整的u,v,w三个向量来描述摄像机的旋向【这里要结合着代码看与下面的图片看】。
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.16-cam-view-up.jpg)
+
+
+
+> Remember that `vup`, `v`, and `w` are all in the same plane. Note that, like before when our fixed camera faced -Z, our arbitrary view camera faces -w. And keep in mind that we can — but we don’t have to — use world up (0,1,0) to specify vup. This is convenient and will naturally keep your camera horizontally level until you decide to experiment with crazy camera angles.
+
+注意`vup`,`v`,`w`处于同一平面内。和先前我们的摄像机面对着-Z方向一样, 修改后的任意视角摄像机面对着-w方向。记得使用世界坐标系的上方向向量(0,1,0)(不是一定要用这个向量)指定vup。这样会比较方便, 并且你的摄像机镜头会保持水平。如果你想试试那些奇怪的摄像角度, 你可以放心大胆的传入别的值。
+
+```diff
+class camera {
+public:
+    camera() {
+        lower_left_corner = vec3(-2.0,-1.0,-1.0);
+        horizontal = vec3(4.0,0.0,0.0);
+        vertical = vec3(0.0,2.0,0.0);
+        origin = vec3(0.0,0.0,0.0);
+    }
+
++   camera(vec3 lookfrom, vec3 lookat, vec3 vup,
+            double vfov, double aspect) { // top to bottom, in degress
+        origin = lookfrom;
+
+        auto theta = degree_to_radians(vfov);
+        auto half_height = tan(theta / 2);
+        auto half_width = aspect * half_height;
++       vec3 w = unit_vector(lookfrom - lookat);
++       vec3 u = unit_vector(cross(vup, w));
++       vec3 v = cross(w, u);
+
++       lower_left_corner = origin - half_width * u - half_height * v - w;
+
++       horizontal = 2 * half_width * u;
++       vertical = 2 * half_height * v;
+    }
+
+    ray get_ray(double u,double v) {
+        return ray(origin,lower_left_corner + u * horizontal + v * vertical - origin);
+    }
+
+public:
+    vec3 origin;
+    vec3 lower_left_corner;
+    vec3 horizontal;
+    vec3 vertical;
+};
+```
+
+
+
+> We'll change back to the prior scene, and use the new viewpoint:
+
+现在我们就可以改变我们的视角了:
+
+```diff
++   const auto aspect_ratio = double(image_width) / image_height;
+
+		// World
+    auto R = cos(pi / 4);
+    hittable_list world;
+
+-   world.add(make_shared<sphere>(
+-           vec3(-R, 0, -1), R, make_shared<lambertian>(vec3(0, 0, 1))));
+-   world.add(make_shared<sphere>(
+-           vec3(R, 0, -1), R, make_shared<lambertian>(vec3(1, 0, 0))));
+
+    world.add(make_shared<sphere>(
+            vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));
+    world.add(make_shared<sphere>(
+            vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));
+
+    world.add(make_shared<sphere>(
+           vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2),0.0)));
+
+    world.add(make_shared<sphere>(
+            vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+
+    // Camera
++   camera cam = camera(vec3(-2, 2, 1), vec3(0, 0, -1), vec3(0, 1, 0), 90, aspect_ratio);
+
+```
+
+
+
+> to get:
+
+我们会得到:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.18-view-distant.png)
+
+
+
+
+
+> And we can change field of view:
+
+
+
+然后我们在改变一下fov:【这里缩小了fov】
+
+```c++
+    // Camera
+    camera cam = camera(vec3(-2, 2, 1), vec3(0, 0, -1), vec3(0, 1, 0), 20, aspect_ratio);
+
+```
+
+
+
+> to get:
+
+会得到:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.19-view-zoom.png)
+
+
+
+### 散焦模糊
+
+>  Now our final feature: defocus blur. Note, all photographers will call it “depth of field” so be aware of only using “defocus blur” among friends.
+
+终于到了我们最后的特性了: 散焦模糊(defocus blur)。基本上所有的摄影师都它叫景深(depth of field)。所以你和你朋友聊天的时候可别提什么defocus blur啊。
+
+
+
+>  The reason we defocus blur in real cameras is because they need a big hole (rather than just a pinhole) to gather light. This would defocus everything, but if we stick a lens in the hole, there will be a certain distance where everything is in focus. You can think of a lens this way: all light rays coming *from* a specific point at the focus distance — and that hit the lens — will be bent back *to* a single point on the image sensor.
+
+现实世界中的摄像机产生对焦模糊的原因是因为他们需要一个很大的孔, 而不是一个针眼大小的小孔来聚集光线。这会导致所有的东西都被散焦了。但如果我们在孔内加入一块透镜, 在一段距离内的所有物体都会被对焦。你可以这样来想象透镜:所有的光线从同一点分散射出, 击中透镜后又聚焦在图像传感器上的一个点上。
+
+
+
+> In a physical camera, the focus distance is controlled by the distance between the lens and the film/sensor. That is why you see the lens move relative to the camera when you change what is in focus (that may happen in your phone camera too, but the sensor moves). The “aperture” is a hole to control how big the lens is effectively. For a real camera, if you need more light you make the aperture bigger, and will get more defocus blur. For our virtual camera, we can have a perfect sensor and never need more light, so we only have an aperture when we want defocus blur.
+
+
+
+在现实世界的相机中, 物体在哪里被聚焦是由透镜距离成像平面与聚焦平面这两个平面的距离所决定的。当你改变对焦设置时,相机中的这个透镜位置就会发生改变(你手机上的摄像头也是这个原理, 只不过透镜不动, 改成了成像传感器动)。快门光圈(aperture)是一个孔, 它控制这块透镜应该多大比较好。如果你需要更多的光线, 你的这个快门光圈就大一点, 景深也会随之加大。对于一个虚拟的摄像机来说, 我们只需要一个传感器就够了。所以我们只需要传入快门光圈的大小就行【即透镜大小】。
+
+
+
+> A real camera has a complicated compound lens. For our code we could simulate the order: sensor, then lens, then aperture. Then we could figure out where to send the rays, and flip the image after it's computed (the image is projected upside down on the film). Graphics people, however, usually use a thin lens approximation:
+
+现实世界中的摄像机的透镜组是很复杂的。但对于我们写代码来说, 我们只需要模拟上述的顺序: 图像传感器, 透镜, 快门, 然后射出光线, 最后记得翻转图片(进过透镜成像会被上下翻转)。图形学中人们常常使用一块薄片透镜近似模拟:
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.17-cam-lens.jpg)
+
+
+
+> We don’t need to simulate any of the inside of the camera. For the purposes of rendering an image outside the camera, that would be unnecessary complexity. Instead, I usually start rays from the lens, and send them toward the focus plane (`focus_dist` away from the lens), where everything on that plane is in perfect focus.
+
+但是我们根本不用模拟任何摄像机内部的东西, 对于我们渲染摄像机外的物体来说, 这些都没必要。我们只要从一个虚拟的透镜范围中发射光线到我们的摄像机平面就能模拟了,这个透镜与平面的距离成为焦距(`focus_dist`)
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/fig-1.18-cam-film-plane.jpg)
+
+
+
+> Normally, all scene rays originate from the `lookfrom` point. In order to accomplish defocus blur, generate random scene rays originating from inside a disk centered at the `lookfrom` point. The larger the radius, the greater the defocus blur. You can think of our original camera as having a defocus disk of radius zero (no blur at all), so all rays originated at the disk center (`lookfrom`).
+
+之前我们所有的光线都是从`lookfrom`发出的, 但现在加入了散焦模糊, 所有光线都从内部的一个虚拟透镜发出, 经过`lookfrom`点, 这个透镜的半径越大, 图像就越模糊。你可以认为之前的摄像机, 这个半径为0。
+
+```c++
+vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}
+```
+
+
+
+
+
+下面给出完整的 `camera.h`：
+
+```diff
+#ifndef RAYTRACING_DEV_CAMERA_H
+#define RAYTRACING_DEV_CAMERA_H
+
+#include "rtweekend.h"
+
+class camera {
+public:
+    camera() {
+        lower_left_corner = vec3(-2.0,-1.0,-1.0);
+        horizontal = vec3(4.0,0.0,0.0);
+        vertical = vec3(0.0,2.0,0.0);
+        origin = vec3(0.0,0.0,0.0);
+    }
+
+    camera(vec3 lookfrom, vec3 lookat, vec3 vup,
++           double vfov, double aspect, double aperture, double focus_dist) { // top to bottom, in degress
+        origin = lookfrom;
++       lens_radius = aperture / 2;
+
+        auto theta = degree_to_radians(vfov);
+        auto half_height = tan(theta / 2);
+        auto half_width = aspect * half_height;
+        w = unit_vector(lookfrom - lookat);
+        u = unit_vector(cross(vup, w));
+        v = cross(w, u);
+
+-       lower_left_corner = origin - half_width * u - half_height * v - w;
++       lower_left_corner = origin
++                         - half_width * focus_dist * u
++                         - half_height * focus_dist * v
++                         - focus_dist * w;
+
+-       horizontal = 2 * half_width * u;
+-       vertical = 2 * half_height * v;
++       horizontal = 2 * half_width * focus_dist * u;
++       vertical = 2 * half_height * focus_dist * v;
+    }
+
++   ray get_ray(double s, double t) {
++       vec3 rd = lens_radius * random_in_unit_disk();
++       vec3 offset = u * rd.x() + v * rd.y();
+
++       return ray(
++               origin + offset,
++               lower_left_corner + s * horizontal + t * vertical - origin - offset
++               );
++   }
+
+public:
+    vec3 origin;
+    vec3 lower_left_corner;
+    vec3 horizontal;
+    vec3 vertical;
++   vec3 u, v, w;
++   double lens_radius;
+};
+
+#endif //RAYTRACING_DEV_CAMERA_H
+```
+
+
+
+
+
+> Using a big aperture:
+
+我们使用一个大大的快门光圈:
+
+```c++
+const auto aspect_ratio = double(image_width) / image_height;
+...
+vec3 lookfrom(3,3,2);
+vec3 lookat(0,0,-1);
+vec3 vup(0,1,0);
+auto dist_to_focus = (lookfrom-lookat).length();
+auto aperture = 2.0;
+
+camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+```
+
+
+
+
+
+> We get:
+
+We get:
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.20-depth-of-field.png)
+
+
+
+### 接下来学什么
+
+首先我们在 `main.cpp` 把书的封面图——许多许多的随机球渲染出来:
+
+```c++
+hittable_list random_scene() {
+    hittable_list world;
+
+    world.add(make_shared<sphere>(
+        vec3(0,-1000,0), 1000, make_shared<lambertian>(vec3(0.5, 0.5, 0.5))));
+
+    int i = 1;
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            auto choose_mat = random_double();
+            vec3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
+            if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = vec3::random() * vec3::random();
+                    world.add(
+                        make_shared<sphere>(center, 0.2, make_shared<lambertian>(albedo)));
+                } else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = vec3::random(.5, 1);
+                    auto fuzz = random_double(0, .5);
+                    world.add(
+                        make_shared<sphere>(center, 0.2, make_shared<metal>(albedo, fuzz)));
+                } else {
+                    // glass
+                    world.add(make_shared<sphere>(center, 0.2, make_shared<dielectric>(1.5)));
+                }
+            }
+        }
+    }
+
+    world.add(make_shared<sphere>(vec3(0, 1, 0), 1.0, make_shared<dielectric>(1.5)));
+
+    world.add(
+        make_shared<sphere>(vec3(-4, 1, 0), 1.0, make_shared<lambertian>(vec3(0.4, 0.2, 0.1))));
+
+    world.add(
+        make_shared<sphere>(vec3(4, 1, 0), 1.0, make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
+
+    return world;
+}
+
+int main() {
+    ...
+    auto world = random_scene();
+
+    vec3 lookfrom(13,2,3);
+    vec3 lookat(0,0,0);
+    vec3 vup(0,1,0);
+    auto dist_to_focus = 10.0;
+    auto aperture = 0.1;
+
+    camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+    ...
+}
+```
+
+
+
+![](https://cdn.jsdelivr.net/gh/Yousazoe/picgo-repo/img/img-1.21-book1-final.jpg)
+
+你可能会发现玻璃球没有阴影, 使得他们看上去像漂浮在空中似得。这不是bug(你在现实世界中很少有机会见到真正的玻璃球, 它们看起来的确就是这样的)。玻璃球下的那个作为地板的大球仍然能被那么多光线击中, 玻璃球下的那个作为地板的大球仍然能被那么多光线击中, 因为光线并不会被玻璃球阻挡，经由玻璃球的折射最终射向天空。【the sky is re-ordered rather than blocked. 感谢评论区[Kanichiyaoba](https://www.zhihu.com/people/iioo-95) 的翻译解答】
+
+现在你拥有一个coooool毙了的光线追踪器了! 那接下来我该何去何从呢?【标*为[下本书](https://oxine.github.io/Graphic/Ray-tracing-the-next-week/)中的内容】
+
+1. 光照。你可以使用阴影光线来显式实现这部分, 也可以使用产生光线的材质来隐式实现*。
+
+2. 偏移散射光线, 然后降低这些光线的权重来消除偏移。这两种都行。硬要说的话, 我偏向后者一点点。【我猜这句话是在说消除自相交所导致的阴影 即Shadow Ance, 如果有人知道这是在说什么请教教我吧！】
+
+3. 加入三角形。大部分模型都是三角网格。模型的IO部分是最恶心的, 基本上所有人都不想自己写, 都去找别人的代码用。
+
+4. 表面纹理*。这可以让你像贴墙纸一样把图片贴到物体上去。实现起来也很简单。
+
+5. 固体纹理*。可以参见Ken Perlin的在线代码, Andrew Kensler的blog中也有关于这部分的信息。
+
+6. 体积体(volumes 即雾等)*与其他介质。很Cool, 但是会改变你的代码构筑。我喜欢把体积体也设计成hittable的子类, 根据其密度来随机决定光线是否与其相交。使用这个方法, 你的渲染器甚至不用知道你渲的是体积体就渲出来了。
+
+7. 并行优化。使用不同的随机种子, 把你的代码复制上N份跑在N个核心上,然后再求平均值。你可以分层来完成这部分工作, 比如分成N/2对, 每次平均求出N/4【为什么是N/4啊？？这翻译翻不下去了！】的图片, 然后在对这些对之间求平均值。这应该用不了多少代码【试试CUDA吧】。
+
+记得把你渲染出的炫酷图片发给我!祝你愉快!
+
