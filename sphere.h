@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "hittable.h"
+#include "aabb.h"
 #include "vec3.h"
 
 class sphere : public hittable {
@@ -13,6 +14,7 @@ public:
         : center(cen),radius(r),mat_ptr(m) {};
 
     virtual bool hit(const ray& r,double t_min,double t_max,hit_record& rec) const;
+    virtual bool bounding_box(double t0, double t1, aabb &output_box) const;
 
 public:
     vec3 center;
@@ -51,6 +53,13 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     }
 
     return false;
+}
+
+bool sphere::bounding_box(double t0, double t1, aabb &output_box) const {
+    output_box = aabb(
+            center - vec3(radius, radius, radius),
+            center + vec3(radius, radius, radius));
+    return true;
 }
 
 #endif //RAYTRACING_DEV_SPHERE_H

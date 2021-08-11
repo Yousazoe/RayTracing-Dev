@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/bvh.h
+algorithm
+-
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+hittable_list.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/camera.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
@@ -13,12 +27,16 @@ rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+aabb.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+aabb.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 memory
 -
 vector
@@ -37,6 +55,8 @@ moving_sphere.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/moving_sphere.h
 material.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h
+bvh.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/bvh.h
 iostream
 -
 memory
@@ -51,6 +71,8 @@ hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/moving_sphere.h
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+aabb.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
 vec3.h
@@ -75,6 +97,8 @@ utility
 -
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+aabb.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
 
