@@ -1,6 +1,7 @@
 #ifndef RAYTRACING_DEV_TEXTURE_H
 #define RAYTRACING_DEV_TEXTURE_H
 
+#include "perlin.h"
 #include "rtweekend.h"
 
 class texture {
@@ -37,6 +38,21 @@ public:
 public:
     shared_ptr<texture> odd;
     shared_ptr<texture> even;
+};
+
+
+class nosie_texture : public texture {
+public:
+    nosie_texture() {}
+    nosie_texture(double sc) : scale(sc) {}
+
+    virtual vec3 value(double u, double v, const vec3& p) const {
+        return vec3(1, 1, 1) * 0.5 * (1 + sin(scale * p.z() + 10 * noise.turb(p)));
+    }
+
+public:
+    perlin noise;
+    double scale;
 };
 
 #endif //RAYTRACING_DEV_TEXTURE_H

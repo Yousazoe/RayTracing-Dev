@@ -76,6 +76,10 @@ hittable.h
 aabb.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/perlin.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
 vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
@@ -105,6 +109,8 @@ vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h
+perlin.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/perlin.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 

@@ -90,6 +90,16 @@ hittable_list two_spheres() {
     return objects;
 }
 
+hittable_list two_perlin_spheres() {
+    hittable_list objects;
+
+    auto pertex = make_shared<nosie_texture>(4);
+    objects.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(pertex)));
+    objects.add(make_shared<sphere>(vec3(0, 2, 0), 2, make_shared<lambertian>(pertex)));
+
+    return objects;
+}
+
 int main() {
 
     // Image
@@ -101,7 +111,8 @@ int main() {
 
     // World
     //auto world = random_scene();
-    auto world = two_spheres();
+    //auto world = two_spheres();
+    auto world = two_perlin_spheres();
 
     // Camera
     vec3 lookfrom(13, 2, 3);
