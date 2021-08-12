@@ -65,6 +65,8 @@ memory
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+texture.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 
@@ -101,6 +103,10 @@ aabb.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aabb.h
 vec3.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
 iostream

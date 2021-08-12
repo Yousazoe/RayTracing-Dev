@@ -113,6 +113,9 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>

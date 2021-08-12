@@ -31,8 +31,15 @@ vec3 ray_color(const ray& r,const hittable& world,int depth) {
 hittable_list random_scene() {
     hittable_list world;
 
-    world.add(make_shared<sphere>(
-            vec3(0,-1000,0), 1000, make_shared<lambertian>(vec3(0.5, 0.5, 0.5))));
+    //world.add(make_shared<sphere>(
+    //        vec3(0,-1000,0), 1000, make_shared<lambertian>(vec3(0.5, 0.5, 0.5))));
+
+    auto checker = make_shared<checker_texture>(
+            make_shared<constant_texture>(vec3(0.2, 0.3, 0.1)),
+            make_shared<constant_texture>(vec3(0.9, 0.9, 0.9))
+    );
+
+    world.add(make_shared<sphere>(vec3(0, -1000, 0), 1000, make_shared<lambertian>(checker)));
 
     int i = 1;
     for (int a = -10; a < 10; a++) {
@@ -70,6 +77,19 @@ hittable_list random_scene() {
     return static_cast<hittable_list>(make_shared<bvh_node>(world,0,1));
 }
 
+
+hittable_list two_spheres() {
+    hittable_list objects;
+
+    auto checker = make_shared<checker_texture>(
+            make_shared<constant_texture>(vec3(0.2, 0.3, 0.1)),
+                        make_shared<constant_texture>(vec3(0.9, 0.9, 0.9)));
+
+    objects.add(make_shared<sphere>(vec3(0, -10, 0), 10, make_shared<lambertian>(checker)));
+    objects.add(make_shared<sphere>(vec3(0, 10, 0), 10, make_shared<lambertian>(checker)));
+    return objects;
+}
+
 int main() {
 
     // Image
@@ -80,14 +100,15 @@ int main() {
     const auto aspect_ratio = double(image_width) / image_height;
 
     // World
-    auto world = random_scene();
+    //auto world = random_scene();
+    auto world = two_spheres();
 
     // Camera
     vec3 lookfrom(13, 2, 3);
     vec3 lookat(0, 0, 0);
     vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
-    auto aperture = 0.1;
+    auto aperture = 0.0;
 
     camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
 
