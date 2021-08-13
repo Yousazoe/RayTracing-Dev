@@ -1,11 +1,12 @@
 #include "camera.h"
 #include "rtweekend.h"
-
 #include "hittable_list.h"
 #include "sphere.h"
 #include "moving_sphere.h"
 #include "material.h"
 #include "bvh.h"
+#include "surface_texture.h"
+#include "rtw_stb_image.h"
 
 #include <iostream>
 #include <memory>
@@ -100,6 +101,19 @@ hittable_list two_perlin_spheres() {
     return objects;
 }
 
+hittable_list earth() {
+    int nx, ny, nn;
+    unsigned char* texture_data = stbi_load("vendor/stb/earthmap.jpg", &nx, &ny, &nn, 0);
+    if (!texture_data)
+        std::cerr << "ERROR: Could not load texture image file" << ".\n";
+
+    auto earth_surface =
+            make_shared<lambertian>(make_shared<image_texture>(texture_data, nx, ny));
+    auto globe = make_shared<sphere>(vec3(0,0,0), 2, earth_surface);
+
+    return hittable_list(globe);
+}
+
 int main() {
 
     // Image
@@ -112,7 +126,8 @@ int main() {
     // World
     //auto world = random_scene();
     //auto world = two_spheres();
-    auto world = two_perlin_spheres();
+    //auto world = two_perlin_spheres();
+    auto world = earth();
 
     // Camera
     vec3 lookfrom(13, 2, 3);

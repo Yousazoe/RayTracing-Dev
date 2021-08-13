@@ -12,7 +12,10 @@ CMakeFiles/RayTracing_Dev.dir/main.cpp.o
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/moving_sphere.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/perlin.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
+ /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtw_stb_image.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h
+ /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/surface_texture.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h
  /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h
+ /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vendor/stb/stb_image.h

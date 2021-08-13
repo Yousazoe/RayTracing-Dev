@@ -110,16 +110,25 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtw_stb_image.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/surface_texture.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/texture.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vec3.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/vendor/stb/stb_image.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/CMakeLists.txt">
