@@ -38,6 +38,12 @@ hittable_list.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/constant_medium.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+material.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/material.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 ray.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h
@@ -79,6 +85,8 @@ aarect.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aarect.h
 box.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/box.h
+constant_medium.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/constant_medium.h
 iostream
 -
 memory

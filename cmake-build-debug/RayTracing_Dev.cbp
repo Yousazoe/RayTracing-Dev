@@ -95,6 +95,9 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/camera.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/constant_medium.h">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
