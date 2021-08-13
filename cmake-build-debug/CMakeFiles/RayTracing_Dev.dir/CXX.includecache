@@ -16,6 +16,14 @@ rtweekend.h
 hittable.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/box.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+aarect.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aarect.h
+hittable_list.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/bvh.h
 algorithm
 -
@@ -69,6 +77,8 @@ rtw_stb_image.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtw_stb_image.h
 aarect.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aarect.h
+box.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/box.h
 iostream
 -
 memory

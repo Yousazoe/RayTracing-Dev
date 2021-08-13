@@ -3,6 +3,7 @@
 
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../aabb.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../aarect.h
+CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../box.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../bvh.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../camera.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../hittable.h

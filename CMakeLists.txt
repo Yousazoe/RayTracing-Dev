@@ -20,4 +20,6 @@ add_executable(RayTracing_Dev
         perlin.h
         surface_texture.h
         vendor/stb/stb_image.h
-        rtw_stb_image.h aarect.h)
+        rtw_stb_image.h
+        aarect.h
+        box.h)
