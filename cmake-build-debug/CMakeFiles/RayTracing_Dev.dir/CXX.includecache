@@ -10,6 +10,12 @@
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aarect.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+hittable.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable.h
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/bvh.h
 algorithm
 -
@@ -61,6 +67,8 @@ surface_texture.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/surface_texture.h
 rtw_stb_image.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtw_stb_image.h
+aarect.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/aarect.h
 iostream
 -
 memory
