@@ -22,3 +22,8 @@ CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../texture.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../vec3.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../vendor/stb/stb_image.h
 
+CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: ../pi.cpp
+CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: ../ray.h
+CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: ../rtweekend.h
+CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: ../vec3.h
+

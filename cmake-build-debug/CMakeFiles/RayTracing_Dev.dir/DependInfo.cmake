@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp" "/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles/RayTracing_Dev.dir/main.cpp.o"
+  "/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp" "/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles/RayTracing_Dev.dir/pi.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

@@ -150,6 +150,33 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+pi.o: pi.cpp.o
+
+.PHONY : pi.o
+
+# target to build an object file
+pi.cpp.o:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.o
+.PHONY : pi.cpp.o
+
+pi.i: pi.cpp.i
+
+.PHONY : pi.i
+
+# target to preprocess a source file
+pi.cpp.i:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.i
+.PHONY : pi.cpp.i
+
+pi.s: pi.cpp.s
+
+.PHONY : pi.s
+
+# target to generate assembly for a file
+pi.cpp.s:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.s
+.PHONY : pi.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +189,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... pi.o"
+	@echo "... pi.i"
+	@echo "... pi.s"
 .PHONY : help
 
 
