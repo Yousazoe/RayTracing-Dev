@@ -13,6 +13,7 @@ CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../main.cpp
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../material.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../moving_sphere.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../onb.h
+CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../pdf.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../perlin.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../ray.h
 CMakeFiles/RayTracing_Dev.dir/main.cpp.o: ../rtw_stb_image.h

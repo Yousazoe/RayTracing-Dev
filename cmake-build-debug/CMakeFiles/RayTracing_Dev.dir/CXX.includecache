@@ -87,6 +87,8 @@ box.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/box.h
 constant_medium.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/constant_medium.h
+pdf.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pdf.h
 iostream
 -
 memory
@@ -111,6 +113,12 @@ aabb.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/onb.h
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pdf.h
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+onb.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/onb.h
 
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/perlin.h
 rtweekend.h

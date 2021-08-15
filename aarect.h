@@ -31,11 +31,28 @@ public:
     xz_rect(double _x0, double _x1, double _z0, double _z1, double _k, shared_ptr<material> mat)
             : x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
 
-    virtual bool hit(const ray& r, double t0, double t1, hit_record& rec) const;
+    virtual bool hit(const ray& r, double t0, double t1, hit_record& rec) const override ;
 
-    virtual bool bounding_box(double t0, double t1, aabb& output_box) const {
+    virtual bool bounding_box(double t0, double t1, aabb& output_box) const override {
         output_box =  aabb(vec3(x0,k-0.0001,z0), vec3(x1, k+0.0001, z1));
         return true;
+    }
+
+    virtual double pdf_value(const vec3& origin, const vec3& v) const override {
+        hit_record rec;
+        if (!this->hit(ray(origin, v), 0.001, infinity, rec))
+            return 0;
+
+        auto area = (x1-x0)*(z1-z0);
+        auto distance_squared = rec.t * rec.t * v.length_squared();
+        auto cosine = fabs(dot(v, rec.normal) / v.length());
+
+        return distance_squared / (cosine * area);
+    }
+
+    virtual vec3 random(const vec3& origin) const override {
+        auto random_point = vec3(random_double(x0,x1), k, random_double(z0,z1));
+        return random_point - origin;
     }
 
 public:
