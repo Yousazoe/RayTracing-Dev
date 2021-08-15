@@ -123,33 +123,6 @@ RayTracing_Dev/fast:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/build
 .PHONY : RayTracing_Dev/fast
 
-integrate_x_sq.o: integrate_x_sq.cpp.o
-
-.PHONY : integrate_x_sq.o
-
-# target to build an object file
-integrate_x_sq.cpp.o:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o
-.PHONY : integrate_x_sq.cpp.o
-
-integrate_x_sq.i: integrate_x_sq.cpp.i
-
-.PHONY : integrate_x_sq.i
-
-# target to preprocess a source file
-integrate_x_sq.cpp.i:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.i
-.PHONY : integrate_x_sq.cpp.i
-
-integrate_x_sq.s: integrate_x_sq.cpp.s
-
-.PHONY : integrate_x_sq.s
-
-# target to generate assembly for a file
-integrate_x_sq.cpp.s:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.s
-.PHONY : integrate_x_sq.cpp.s
-
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -177,60 +150,6 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-pi.o: pi.cpp.o
-
-.PHONY : pi.o
-
-# target to build an object file
-pi.cpp.o:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.o
-.PHONY : pi.cpp.o
-
-pi.i: pi.cpp.i
-
-.PHONY : pi.i
-
-# target to preprocess a source file
-pi.cpp.i:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.i
-.PHONY : pi.cpp.i
-
-pi.s: pi.cpp.s
-
-.PHONY : pi.s
-
-# target to generate assembly for a file
-pi.cpp.s:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.s
-.PHONY : pi.cpp.s
-
-sphere_importance.o: sphere_importance.cpp.o
-
-.PHONY : sphere_importance.o
-
-# target to build an object file
-sphere_importance.cpp.o:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o
-.PHONY : sphere_importance.cpp.o
-
-sphere_importance.i: sphere_importance.cpp.i
-
-.PHONY : sphere_importance.i
-
-# target to preprocess a source file
-sphere_importance.cpp.i:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.i
-.PHONY : sphere_importance.cpp.i
-
-sphere_importance.s: sphere_importance.cpp.s
-
-.PHONY : sphere_importance.s
-
-# target to generate assembly for a file
-sphere_importance.cpp.s:
-	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.s
-.PHONY : sphere_importance.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -240,18 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... RayTracing_Dev"
-	@echo "... integrate_x_sq.o"
-	@echo "... integrate_x_sq.i"
-	@echo "... integrate_x_sq.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... pi.o"
-	@echo "... pi.i"
-	@echo "... pi.s"
-	@echo "... sphere_importance.o"
-	@echo "... sphere_importance.i"
-	@echo "... sphere_importance.s"
 .PHONY : help
 
 

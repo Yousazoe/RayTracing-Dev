@@ -104,9 +104,6 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
-		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp">
-			<Option target="RayTracing_Dev"/>
-		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
@@ -119,9 +116,6 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/perlin.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
-		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp">
-			<Option target="RayTracing_Dev"/>
-		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/ray.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
@@ -132,9 +126,6 @@
 			<Option target="RayTracing_Dev"/>
 		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere.h">
-			<Option target="RayTracing_Dev"/>
-		</Unit>
-		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere_importance.cpp">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/surface_texture.h">

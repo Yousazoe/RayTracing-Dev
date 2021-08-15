@@ -28,11 +28,15 @@ vec3 ray_color(const ray& r, const vec3& background, const hittable& world,int d
     ray scattered;
     vec3 attenuation;
     vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+    double pdf;
+    vec3 albedo;
 
-    if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+    if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
         return emitted;
 
-    return emitted + attenuation * ray_color(scattered, background, world, depth-1);
+    return emitted
+        + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
+                      * ray_color(scattered, background, world, depth - 1) / pdf;
 }
 
 hittable_list random_scene() {
@@ -264,12 +268,41 @@ hittable_list final_scene() {
     return objects;
 }
 
+hittable_list cornell_box_plus() {
+    hittable_list objects;
+
+    auto red = make_shared<lambertian>(make_shared<constant_texture>(vec3(0.65, 0.05, 0.05)));
+    auto white = make_shared<lambertian>(make_shared<constant_texture>(vec3(0.73, 0.73, 0.73)));
+    auto green = make_shared<lambertian>(make_shared<constant_texture>(vec3(0.12, 0.45, 0.15)));
+    auto light = make_shared<diffuse_light>(make_shared<constant_texture>(vec3(15, 15, 15)));
+
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+    objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+    shared_ptr<hittable> box1 = make_shared<box>(vec3(0,0,0), vec3(165,330,165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265,0,295));
+    objects.add(box1);
+
+    shared_ptr<hittable> box2 = make_shared<box>(vec3(0,0,0), vec3(165,165,165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130,0,65));
+    objects.add(box2);
+
+    return objects;
+}
+
+
 int main() {
 
     // Image
-    const int image_width = 800;
-    const int image_height = 800;
-    const int samples_per_pixel = 10000;
+    const int image_width = 200;
+    const int image_height = 100;
+    const int samples_per_pixel = 100;
     const int max_depth = 50;
     const auto aspect_ratio = double(image_width) / image_height;
 
@@ -281,18 +314,22 @@ int main() {
     //auto world = simple_light();
     //auto world = cornell_box();
     //auto world = cornell_smoke();
-    auto world = final_scene();
+    //auto world = final_scene();
+    auto world = cornell_box_plus();
+
+    const vec3 background(0, 0, 0);
 
     // Camera
-    vec3 lookfrom(478, 278, -600);
+    vec3 lookfrom(278, 278, -800);
     vec3 lookat(278, 278, 0);
     vec3 vup(0, 1, 0);
     auto dist_to_focus = 10.0;
     auto aperture = 1.0;
     auto vfov = 40.0;
-    const vec3 background(0, 0, 0);
+    auto time0 = 0.0;
+    auto time1 = 1.0;
 
-    camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
+    camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, time0, time1);
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";

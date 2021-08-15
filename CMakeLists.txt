@@ -22,4 +22,5 @@ add_executable(RayTracing_Dev
         vendor/stb/stb_image.h
         rtw_stb_image.h
         aarect.h
-        box.h constant_medium.h pi.cpp integrate_x_sq.cpp sphere_importance.cpp)
+        box.h
+        constant_medium.h)

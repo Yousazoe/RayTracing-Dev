@@ -70,62 +70,17 @@ CMakeFiles/RayTracing_Dev.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RayTracing_Dev.dir/main.cpp.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp -o CMakeFiles/RayTracing_Dev.dir/main.cpp.s
 
-CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: CMakeFiles/RayTracing_Dev.dir/flags.make
-CMakeFiles/RayTracing_Dev.dir/pi.cpp.o: ../pi.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/RayTracing_Dev.dir/pi.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/RayTracing_Dev.dir/pi.cpp.o -c /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp
-
-CMakeFiles/RayTracing_Dev.dir/pi.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RayTracing_Dev.dir/pi.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp > CMakeFiles/RayTracing_Dev.dir/pi.cpp.i
-
-CMakeFiles/RayTracing_Dev.dir/pi.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RayTracing_Dev.dir/pi.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp -o CMakeFiles/RayTracing_Dev.dir/pi.cpp.s
-
-CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o: CMakeFiles/RayTracing_Dev.dir/flags.make
-CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o: ../integrate_x_sq.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o -c /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp
-
-CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp > CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.i
-
-CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp -o CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.s
-
-CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o: CMakeFiles/RayTracing_Dev.dir/flags.make
-CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o: ../sphere_importance.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o -c /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere_importance.cpp
-
-CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere_importance.cpp > CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.i
-
-CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/sphere_importance.cpp -o CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.s
-
 # Object files for target RayTracing_Dev
 RayTracing_Dev_OBJECTS = \
-"CMakeFiles/RayTracing_Dev.dir/main.cpp.o" \
-"CMakeFiles/RayTracing_Dev.dir/pi.cpp.o" \
-"CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o" \
-"CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o"
+"CMakeFiles/RayTracing_Dev.dir/main.cpp.o"
 
 # External object files for target RayTracing_Dev
 RayTracing_Dev_EXTERNAL_OBJECTS =
 
 RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/main.cpp.o
-RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/pi.cpp.o
-RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o
-RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o
 RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/build.make
 RayTracing_Dev: CMakeFiles/RayTracing_Dev.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable RayTracing_Dev"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable RayTracing_Dev"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/RayTracing_Dev.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

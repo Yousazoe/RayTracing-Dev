@@ -1,8 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o"
   "CMakeFiles/RayTracing_Dev.dir/main.cpp.o"
-  "CMakeFiles/RayTracing_Dev.dir/pi.cpp.o"
-  "CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o"
   "RayTracing_Dev"
   "RayTracing_Dev.pdb"
 )

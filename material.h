@@ -12,8 +12,16 @@ public:
     }
 
     virtual bool scatter(
-            const ray& r_in,const hit_record& rec,vec3& attenuation,ray& scattered
-            ) const = 0;
+            const ray& r_in,const hit_record& rec,vec3& attenuation,ray& scattered, double& pdf
+            ) const {
+        return false;
+    };
+
+    virtual double scattering_pdf (
+            const ray& r_in, const hit_record& rec, const ray& scattered
+            ) const {
+        return 0;
+    }
 };
 
 class lambertian : public material {
@@ -22,12 +30,20 @@ public:
     lambertian(shared_ptr<texture> a) : albedo(a) {}
 
     virtual bool scatter(
-            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered, double& pdf
     ) const {
         vec3 scatter_direction = rec.normal + random_unit_vector();
         scattered = ray(rec.p, scatter_direction, r_in.time());
         attenuation = albedo->value(rec.u, rec.v, rec.p);
+        pdf = dot(rec.normal, scattered.direction()) / pi;
         return true;
+    }
+
+    double scattering_pdf(
+            const ray& r_in, const hit_record& rec, const ray& scattered
+            ) const {
+        auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
+        return 0 ? 0 : cosine / pi;
     }
 public:
     shared_ptr<texture> albedo;
