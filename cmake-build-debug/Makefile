@@ -204,6 +204,33 @@ pi.cpp.s:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/pi.cpp.s
 .PHONY : pi.cpp.s
 
+sphere_importance.o: sphere_importance.cpp.o
+
+.PHONY : sphere_importance.o
+
+# target to build an object file
+sphere_importance.cpp.o:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.o
+.PHONY : sphere_importance.cpp.o
+
+sphere_importance.i: sphere_importance.cpp.i
+
+.PHONY : sphere_importance.i
+
+# target to preprocess a source file
+sphere_importance.cpp.i:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.i
+.PHONY : sphere_importance.cpp.i
+
+sphere_importance.s: sphere_importance.cpp.s
+
+.PHONY : sphere_importance.s
+
+# target to generate assembly for a file
+sphere_importance.cpp.s:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/sphere_importance.cpp.s
+.PHONY : sphere_importance.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -222,6 +249,9 @@ help:
 	@echo "... pi.o"
 	@echo "... pi.i"
 	@echo "... pi.s"
+	@echo "... sphere_importance.o"
+	@echo "... sphere_importance.i"
+	@echo "... sphere_importance.s"
 .PHONY : help
 
 
