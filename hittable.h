@@ -36,7 +36,7 @@ public:
         if (!ptr->hit(r, t_min, t_max, rec))
             return false;
 
-        rec.front_face = ! rec.front_face;
+        rec.front_face = !rec.front_face;
         return true;
     }
 
