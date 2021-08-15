@@ -23,4 +23,4 @@ add_executable(RayTracing_Dev
         rtw_stb_image.h
         aarect.h
         box.h
-        constant_medium.h)
+        constant_medium.h onb.h)

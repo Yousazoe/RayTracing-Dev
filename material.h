@@ -2,6 +2,7 @@
 #define RAYTRACING_DEV_MATERIAL_H
 
 #include "ray.h"
+#include "onb.h"
 #include "texture.h"
 #include "hittable.h"
 
@@ -32,10 +33,13 @@ public:
     virtual bool scatter(
             const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered, double& pdf
     ) const {
+        onb uvw;
+        uvw.build_from_w(rec.normal);
+        auto direction = uvw.local(random_cosine_direction());
         vec3 scatter_direction = rec.normal + random_unit_vector();
         scattered = ray(rec.p, scatter_direction, r_in.time());
         attenuation = albedo->value(rec.u, rec.v, rec.p);
-        pdf = dot(rec.normal, scattered.direction()) / pi;
+        pdf = dot(uvw.w(), scattered.direction()) / pi;
         return true;
     }
 
