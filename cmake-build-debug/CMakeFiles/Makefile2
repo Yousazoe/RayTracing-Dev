@@ -74,12 +74,12 @@ clean: CMakeFiles/RayTracing_Dev.dir/clean
 CMakeFiles/RayTracing_Dev.dir/all:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/depend
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=1,2,3 "Built target RayTracing_Dev"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4 "Built target RayTracing_Dev"
 .PHONY : CMakeFiles/RayTracing_Dev.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/RayTracing_Dev.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/RayTracing_Dev.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/RayTracing_Dev.dir/rule

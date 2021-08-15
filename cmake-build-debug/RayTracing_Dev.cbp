@@ -104,6 +104,9 @@
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/hittable_list.h">
 			<Option target="RayTracing_Dev"/>
 		</Unit>
+		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp">
+			<Option target="RayTracing_Dev"/>
+		</Unit>
 		<Unit filename="/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/main.cpp">
 			<Option target="RayTracing_Dev"/>
 		</Unit>

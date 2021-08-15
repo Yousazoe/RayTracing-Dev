@@ -123,6 +123,33 @@ RayTracing_Dev/fast:
 	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/build
 .PHONY : RayTracing_Dev/fast
 
+integrate_x_sq.o: integrate_x_sq.cpp.o
+
+.PHONY : integrate_x_sq.o
+
+# target to build an object file
+integrate_x_sq.cpp.o:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.o
+.PHONY : integrate_x_sq.cpp.o
+
+integrate_x_sq.i: integrate_x_sq.cpp.i
+
+.PHONY : integrate_x_sq.i
+
+# target to preprocess a source file
+integrate_x_sq.cpp.i:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.i
+.PHONY : integrate_x_sq.cpp.i
+
+integrate_x_sq.s: integrate_x_sq.cpp.s
+
+.PHONY : integrate_x_sq.s
+
+# target to generate assembly for a file
+integrate_x_sq.cpp.s:
+	$(MAKE) -f CMakeFiles/RayTracing_Dev.dir/build.make CMakeFiles/RayTracing_Dev.dir/integrate_x_sq.cpp.s
+.PHONY : integrate_x_sq.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -186,6 +213,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... RayTracing_Dev"
+	@echo "... integrate_x_sq.o"
+	@echo "... integrate_x_sq.i"
+	@echo "... integrate_x_sq.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

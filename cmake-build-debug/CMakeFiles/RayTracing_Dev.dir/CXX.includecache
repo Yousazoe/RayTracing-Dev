@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/integrate_x_sq.cpp
+rtweekend.h
+/Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
+iostream
+-
+iomanip
+-
+
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/pi.cpp
 rtweekend.h
 /Users/apple/Desktop/Dev/Clion/RayTracing/RayTracing-Dev/rtweekend.h
